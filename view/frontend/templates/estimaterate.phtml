@@ -1,0 +1,71 @@
+<style>
+    .getrate {
+        margin: 0px 0px 15px;
+        width: 100%;
+    }
+</style>
+
+<button id='getrate' class='getrate' disabled="true">Get Shipping Quotes</button>
+
+<script type="text/javascript">
+    require([
+        'jquery',
+        'domReady',
+        'ko',
+        'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/model/shipping-rate-registry',
+        'Magento_Checkout/js/model/shipping-rate-processor/new-address',
+        'Magento_Checkout/js/model/shipping-rate-processor/customer-address'
+    ], function ($, domReady, ko, quote, rateRegistry, defaultProcessor, customerAddressProcessor) {
+
+        domReady(function () {
+            // Get latest shipping rates
+            $('#getrate').on('click', function (e) {
+
+                let processors = [];
+
+                let address = quote.shippingAddress();
+                address = getShippingAddress(address);
+
+                rateRegistry.set(address.getCacheKey(), null);
+
+                processors.default =  defaultProcessor;
+                processors['customer-address'] = customerAddressProcessor;
+
+                let type = address.getType();
+
+                if (processors[type]) {
+                    processors[type].getRates(address);
+                } else {
+                    processors.default.getRates(address);
+                }
+            });
+
+
+        var interval = null;
+            interval = setInterval(checkAddress, 1000);
+
+        function checkAddress() {
+            if ($("#block-summary [name=country_id]").length) {
+
+                $('[name=region_id], [name=postcode], [name=city]').unbind();
+                $('[name=country_id], [name=region_id], [name=postcode], [name=city]').each(function (index) {
+                    ko.cleanNode(this);
+                });
+                $('#getrate').prop('disabled', false);
+                clearInterval(interval);
+            }
+        }
+        // Get latest address data
+        function getShippingAddress(address) {
+            address.city        = $('input[name="city"]').val();
+            address.countryId   = $('select[name="country_id"]').val();
+            address.postcode    = $('input[name="postcode"]').val();
+            address.regionId    = $('select[name="region_id"]').val() ? $('select[name="region_id"]').val() : 0;
+            address.region      = $('select[name="region"]').val();
+
+            return address;
+        }
+    });
+});
+</script>

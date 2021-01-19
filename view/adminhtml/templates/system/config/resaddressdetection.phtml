@@ -1,0 +1,113 @@
+<script>
+    require(['jquery','domReady!'], function ($) {
+        let carrierdiv = '#gtQuoteSetting_fourth-head';
+        gtLtCurrentPlanNote($, '<?php echo $block->ltlPlanNotice(); ?>', carrierdiv);
+        gtLtPlanQuoteRestriction('<?= $block->escapeJs(__($block->planRestriction())); ?>');
+
+        var endPoint = '<?= $block->apiEndpoint() ?>';
+        gtRatingMethodComment(endPoint);
+
+        $('#gtQuoteSetting_fourth_ratingMethod').on('change', function () {
+            gtRatingMethodComment(endPoint); //Add label on change rating methods
+        });
+
+        $("#gtQuoteSetting_fourth_shipDays").attr('size', '5');
+
+        switch (endPoint) {
+            //    Case for Cerasis
+            case '1':
+                $('.if_ep_gt').closest('tr').hide();
+                let shippingSrvc = $('#gtQuoteSetting_fourth_shippingService');
+                let ratingMthd   = $('#gtQuoteSetting_fourth_ratingMethod');
+
+
+                var interval = null;
+                interval = setInterval(manipulateFields, 1000);
+
+                function manipulateFields() {
+                    let shipVal = shippingSrvc.val();
+                    let ratVal  = ratingMthd.val();
+                    shippingService(shipVal);
+                    ratingMethod(ratVal, shipVal);
+                    clearInterval(interval);
+                }
+
+                // Bind function on change
+                shippingSrvc.on('change', function (){
+                    shippingService(this.value);
+                });
+                // Bind function on change
+                ratingMthd.on('change', function (){
+                    let shipVal = shippingSrvc.val();
+                    let ratVal  = this.value;
+                    ratingMethod(ratVal, shipVal);
+                });
+                // Bind Final Mile services on change
+                $(".if_fm").on('change', function (){
+                    showFmLabelAs(this.value);
+                });
+                break;
+
+
+            //    Case for GlobalTranz
+            case '2':
+                $('.if_ep_cr').closest('tr').hide();
+                $('.if_fm').closest('tr').hide();
+                showFmLabelAs(0);
+                $("#gtQuoteSetting_fourth_gtLtlQuoteServices").attr('size', '2');
+                break;
+        }
+
+        function shippingService(val) {
+            let fmSrvcVal = 0;
+            if (val === '2'){
+                $('.hide_if_fm').closest('tr').hide();
+                $('.if_fm').closest('tr').show();
+                fmSrvcVal = $('.if_fm').val();
+            } else {
+                $('.hide_if_fm').closest('tr').show();
+                $('.if_fm').closest('tr').hide();
+            }
+            showFmLabelAs(fmSrvcVal);
+        }
+
+        function ratingMethod(ratVal, shipVal) {
+            let fields = ['.if_rm_13', '.if_rm_23', '.if_rm_12'];
+            fields.forEach(function(entry) {
+                if (entry.indexOf(ratVal) !== -1 && shipVal === '1'){
+                    $(entry).closest('tr').show();
+                } else {
+                    $(entry).closest('tr').hide();
+                }
+            });
+        }
+
+        function showFmLabelAs(value) {
+            let fields = ['.if_fms_1', '.if_fms_2', '.if_fms_3'];
+            fields.forEach(function(entry) {
+                if (entry.indexOf(value) !== -1){
+                    $(entry).closest('tr').show();
+                } else {
+                    $(entry).closest('tr').hide();
+                }
+            });
+        }
+
+
+    });
+</script>
+<?php
+if ($block->enable == 'yes') {
+    $block->setTemplate('Eniture_ResidentialAddressDetection::/system/config/residentialaddressdetection.phtml');
+    echo $block->getHtml();
+} else {
+    ?>
+    <div class="rad hide_if_fm">
+        <p>
+                <?=
+                $block->escapeHtml(__('Click <a href="%1" target="_blank">here</a> to add the Auto detect residential addresses module.(<a href="%2" target="_blank">Learn more</a>)', "https://eniture.com/magento2-residential-address-detection/", "https://eniture.com/magento2-residential-address-detection/#documentation"), ['a', 'div'])
+                ?>
+        </p>
+    </div>
+    <?php
+}

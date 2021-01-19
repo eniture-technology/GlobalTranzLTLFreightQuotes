@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../lib/internal/Magento/Framework/ObjectManager/etc/config.xsd">
+        <preference for="Magento\Checkout\Block\Cart\LayoutProcessor" type="Eniture\GlobalTranzLTLFreightQuotes\Model\Checkout\Block\Cart\Shipping" />
+
+        <!--<type name="Magento\Sales\Block\Adminhtml\Order\View">
+            <plugin name="Eniture_GlobalTranzLTLFreightQuotes_adminhtml_order_view_add_button" type="Eniture\GlobalTranzLTLFreightQuotes\Sales\Block\Adminhtml\Order\BillOfLadding" sortOrder="10" />
+        </type>-->
+        <type name="Magento\Config\Model\Config">
+            <plugin name="admin_system_config_save_gt_plugin" type="Eniture\GlobalTranzLTLFreightQuotes\Model\Config\SaveConfig" sortOrder="1"/>
+        </type>
+
+    <type name="Magento\Catalog\Ui\DataProvider\CatalogEavValidationRules">
+        <plugin name="validation_for_product_dimesion" type="Eniture\GlobalTranzLTLFreightQuotes\Model\Plugin\Product\ValidationRules"/>
+    </type>
+</config>

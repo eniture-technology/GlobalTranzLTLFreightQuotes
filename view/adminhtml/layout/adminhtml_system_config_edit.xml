@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <link src="Eniture_GlobalTranzLTLFreightQuotes::js/gtcommon.js"/>
+        <link src="Eniture_GlobalTranzLTLFreightQuotes::js/gtTestconnection.js"/>
+        <link src="Eniture_GlobalTranzLTLFreightQuotes::js/gtWarehouse.js"/>
+        <link src="Eniture_GlobalTranzLTLFreightQuotes::js/gtDropship.js"/>
+        <link src="Eniture_GlobalTranzLTLFreightQuotes::js/carriers.js"/>
+        <link src="Eniture_GlobalTranzLTLFreightQuotes::js/gtltlRAD.js"/>
+        <link src="Eniture_GlobalTranzLTLFreightQuotes::js/tagsinput/gtltl-bootstrap-tagsinput.js"/>
+    </head>
+</page>

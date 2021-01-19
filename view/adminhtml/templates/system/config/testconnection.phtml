@@ -1,0 +1,31 @@
+<?php
+$planMsg   = $block->getPlanNotice();
+$connMsgs  = $block->gtLtlConnMsgs();
+$connMsg   = $connMsgs['div'];
+$msgCe   = $connMsgs['msgCe'];
+$msgGt   = $connMsgs['msgGt'];
+?>
+<script>
+    require(['jquery','domReady!'], function($){
+        let carrierDiv = '#gtConnSettings_first-head';
+        gtLtNotesToggleHandling($, '<?= $block->escapeHtml($connMsg, ['a', 'div']); ?>', '.gtLt-conn-setting-note', carrierDiv);
+        gtLtCurrentPlanNote($, '<?= $block->escapeHtml($planMsg, ['a', 'div']); ?>', carrierDiv);
+
+        $("#gtConnSettings_first_endPoint").on("change", function (){
+            let msg = '';
+            if (this.value === '1'){
+                msg = '<?= $block->escapeHtml($msgCe, ['a', 'div']); ?>';
+            }else {
+                msg = '<?= $block->escapeHtml($msgGt, ['a', 'div']); ?>';
+            }
+            $(".gtLt-conn-setting-note div").html(msg);
+        });
+    });
+</script>
+<div class="pp-buttons-container">
+    <button class="primary" id="<?= $block->escapeHtml($block->getId()) ?>" gtConnAjaxUrl="<?= $block->escapeHtml($block->getAjaxCheckUrl()) ?>">
+        <span><span><span><?php echo $block->escapeHtml($block->getButtonLabel()); ?></span></span></span>
+    </button>
+</div>
+<!--API response will show here-->
+<div id="gt-response-box"></div>

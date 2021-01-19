@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <gtQuoteSetting>
+            <fourth>
+                <ownArangementText>I'll Arrange My Own Freight</ownArangementText>
+                <gtLtlQuoteServices>LCR,QTR</gtLtlQuoteServices>
+                <shipDays>1,2,3,4,5</shipDays>
+            </fourth>
+        </gtQuoteSetting>
+        <carriers>
+            <ENGlobalTranzLTL>
+                <active>1</active>
+                <allowed_methods>PYLE,AACT,CHRW-DEMO,CENF,CMMS-DEMO,DAFG,DHRN,EXLA,EXLA-ENVOY,FXNL,HJBT-DEMO,KNIT-DEMO,LKVL,MIDW,NMTF,NEMF,NEMF-CN,NPME,PITD,RLCA,RLCA-ENVOY,RETL,RDFS,SAIA,SEFL,UPGF,UPGF-CAUS,HMES,WTVA,RDWY,RDWY-CN,UPGF-CN,YRCA,CMS,LCR,QTR</allowed_methods>
+                <price>0</price>
+                <model>Eniture\GlobalTranzLTLFreightQuotes\Model\Carrier\GlobalTranzLtlShipping</model>
+                <name>Fixed</name>
+                <title>GlobalTranz LTL Freight Quotes</title>
+                <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
+            </ENGlobalTranzLTL>
+        </carriers>
+    </default>
+</config>

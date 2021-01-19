@@ -1,0 +1,62 @@
+<script>
+    require(['jquery', 'domReady!'], function ($) {
+        let carrierDiv = '#gtLtlCarriers_second-head';
+        gtLtCurrentPlanNote($, '<?php echo $block->getPlanNotice(); ?>', carrierDiv);
+    });
+</script>
+<?php
+
+?>
+<div class="main_container">
+    <h2><strong>GlobalTranz Carriers</strong></h2>
+    <div class="carriers_p">
+        <p class="p1">
+            Identifies which carriers are included in the quote response, not what is displayed in the shopping cart.
+            Identify what displays in the shopping cart in the Quote Settings. For example, you may include quote
+            responses from all carriers, but elect to only show the cheapest three in the shopping cart.
+        </p>
+        <p class="p2">
+            Not all carriers service all origin and destination points. If a carrier doesn't service the ship to
+            address, it is automatically omitted from the quote response. Consider conferring with GlobalTranz account team
+            if you'd like to narrow the number of carrier responses.
+        </p>
+    </div>
+
+    <table class="carrier" id="append_carriers">
+        <thead>
+        <tr>
+            <th>Sr#</th>
+            <th>Carrier Name</th>
+            <th>Logo</th>
+            <th><input type="checkbox" name="gtAllCarriers" class="selectAllServices"
+                       onchange="return selectAllCarriers();" <?php echo (isset($this->selectedCarriers->gtAllCarriers) && $this->selectedCarriers->gtAllCarriers == 'on') ? 'checked' : '' ?>>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php
+        if (isset($this->carriersList) && !empty($this->carriersList)) {
+            $selectedCarriers = (array)$this->selectedCarriers;
+            $count = 0;
+            foreach ($this->carriersList as $scac => $name) { ?>
+                <tr id="row_<?php echo $count + 1; ?>" data-id="<?php echo $count + 1; ?>">
+                    <td><?php echo $count + 1; ?></td>
+                    <td><?php echo $name; ?></td>
+                    <td><img src="<?php echo $this->getViewFileUrl('Eniture_GlobalTranzLTLFreightQuotes::images/'.strtolower($scac).'.png'); ?>"
+                             name="<?php echo $scac; ?>" class="carrier-image" alt="logo"></td>
+                    <td><input type="checkbox" class="cerasisQuoteServices" name="<?php echo $scac; ?>"
+                               value="<?php echo $scac; ?>"
+                               id="<?php $scac; ?>" <?php echo(in_array($scac, $selectedCarriers) ? "checked" : ""); ?> >
+                    </td>
+                </tr>
+                <?php
+                $count++;
+            }
+        } else { ?>
+            <tr style="text-align: center;">
+                <td colspan="4">No carrier available right now. Please refresh.</td>
+            </tr>
+        <?php } ?>
+        </tbody>
+    </table>
+</div>

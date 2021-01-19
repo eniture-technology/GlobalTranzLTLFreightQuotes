@@ -1,0 +1,15 @@
+<script>
+    require([
+        'jquery',
+        'domReady!'
+    ], function ($) {
+            let carrierdiv = '#gtLtlUserGuide_fifth-head';
+            gtLtCurrentPlanNote($, '<?= $block->escapeHtml( $block->ltlPlanNotice(), ['a', 'div']); ?>', carrierdiv);
+    });
+</script>
+<div class="user_guide">
+    <p>
+        <?= $block->escapeHtml(__("The User Guide for this application is maintained on the publisher's website. To view it click <a href='%1' target='_blank'>here</a> or paste the following link into your browser.", $block->docUrl), ['a', 'div'])?>
+    </p>
+    <?= $block->escapeHtml($block->docUrl) ?>
+</div>
