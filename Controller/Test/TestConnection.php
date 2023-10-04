@@ -35,22 +35,41 @@ class TestConnection extends Action
     {
         $credentials = [];
         foreach ($this->getRequest()->getParams() as $key => $data) {
-            $credentials[$key] = filter_var($data, FILTER_SANITIZE_STRING);
+            $credentials[$key] = htmlspecialchars($data, ENT_QUOTES);
         }
         //Need to check whether the credentials array is empty or not
-        $post = [
-            'platform'      => 'magento2',
-            'carrier_mode'  => 'test',
-            'carrierName'   => $credentials['carrierName'],
-            'username'      => $credentials['username'],
-            'password'      => $credentials['password'],
-            'accessKey'     => $credentials['accessKey'],
-            'shipperID'     => $credentials['shipperID'] ?? '',
-            'customerID'    => $credentials['customerID'] ?? '',
-            'licence_key'   => $credentials['pluginLicenceKey'],
-            'serverName'    => $this->request->getServer('SERVER_NAME'),
-        ];
-        $url = EnConstants::INDEX;
+        
+        if($credentials['carrierName'] == 'wweLTL'){
+            $post = [
+                'platform'                  => 'magento2',
+                'carrier_mode'              => 'test',
+                'ApiVersion'                => '2.0',
+                'carrierName'               => $credentials['carrierName'],
+                'speed_freight_username'    => $credentials['username'] ?? '',
+                'speed_freight_password'    => $credentials['password'] ?? '',
+                'clientId'                  => $credentials['clientId'],
+                'clientSecret'                 => $credentials['clientSecret'],
+                'plugin_licence_key'        => $credentials['pluginLicenceKey'],
+                'plugin_domain_name'        => $this->request->getServer('SERVER_NAME'),
+                'isUnishipperNewApi'        => 'yes',
+            ];
+            $url = EnConstants::TEST_CONN_URL_WWE;
+        }else{
+            $post = [
+                'platform'      => 'magento2',
+                'carrier_mode'  => 'test',
+                'carrierName'   => $credentials['carrierName'],
+                'username'      => $credentials['username'],
+                'password'      => $credentials['password'],
+                'accessKey'     => $credentials['accessKey'],
+                'shipperID'     => $credentials['shipperID'] ?? '',
+                'customerID'    => $credentials['customerID'] ?? '',
+                'licence_key'   => $credentials['pluginLicenceKey'],
+                'serverName'    => $this->request->getServer('SERVER_NAME'),
+            ];
+            $url = EnConstants::INDEX;
+        }
+
         $response = $this->dataHelper->cerasisSendCurlRequest($url, $post);
         $result = $this->gtLtlTestConnResponse($response);
         $this->getResponse()->setHeader('Content-type', 'application/json');

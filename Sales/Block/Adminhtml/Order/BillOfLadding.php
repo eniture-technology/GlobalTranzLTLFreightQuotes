@@ -90,8 +90,12 @@ class BillOfLadding
 
         $explode = explode('_', $shippingMethod);
         $this->method = (isset($explode[0])) ? $explode[0] : '';
-        $carriersList = json_decode($this->_scopeConfig->getValue('gtLtlCarriers/second/selectedCarriers', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
-        $carrier = (array)$carriersList;
+        $carriersList = $this->_scopeConfig->getValue('gtLtlCarriers/second/selectedCarriers', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        if(!empty($carriersList) && is_string($carriersList)){
+            $carrier = json_decode($carriersList, true);
+        }else{
+            $carrier = [];
+        }
 
         if ($this->method == 'ENGlobalTranzLTL') {
             if (in_array($explode[1], $carrier)) {

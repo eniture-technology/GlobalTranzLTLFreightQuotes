@@ -94,7 +94,7 @@ class OrderPlacebeforeSaveData implements ObserverInterface
         foreach ($orderDetailData['shipmentData'] as $key => $value) {
             if ($multiShip && !$ownArr) {
                 $quotes = reset($value['quotes']);
-                if ($liftGate) {
+                if ($liftGate && isset($quotes['liftgate'])) {
                     $orderDetailData['shipmentData'][$key]['quotes'] = $quotes['liftgate'];
                 } else {
                     $orderDetailData['shipmentData'][$key]['quotes'] = $quotes['simple'];

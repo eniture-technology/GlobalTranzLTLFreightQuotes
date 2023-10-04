@@ -7,7 +7,6 @@ use Eniture\GlobalTranzLTLFreightQuotes\Helper\Data;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Checkout\Model\Cart;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
@@ -85,11 +84,6 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
     private $productLoader;
 
     /**
-     * @var
-     */
-    private $mageVersion;
-
-    /**
      * @var ObjectManagerInterface
      */
     private $objectManager;
@@ -151,7 +145,6 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
      * @param UrlInterface $urlInterface
      * @param SessionManagerInterface $session
      * @param ProductFactory $productLoader
-     * @param ProductMetadataInterface $productMetadata
      * @param ObjectManagerInterface $objectManager
      * @param GlobalTranzGenerateRequestData $generateReqData
      * @param GlobalTranzManageAllQuotes $manAllQuotes
@@ -175,7 +168,6 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
         UrlInterface $urlInterface,
         SessionManagerInterface $session,
         ProductFactory $productLoader,
-        ProductMetadataInterface $productMetadata,
         ObjectManagerInterface $objectManager,
         GlobalTranzGenerateRequestData $generateReqData,
         GlobalTranzManageAllQuotes $manAllQuotes,
@@ -196,7 +188,6 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
         $this->urlInterface = $urlInterface;
         $this->session = $session;
         $this->productLoader = $productLoader;
-        $this->mageVersion = $productMetadata->getVersion();
         $this->objectManager = $objectManager;
         $this->generateReqData = $generateReqData;
         $this->manageAllQuotes = $manAllQuotes;
@@ -238,9 +229,10 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
             return false;
         }
 
-        /*if (empty($request->getDestCity()) || empty($request->getDestRegionCode()) || empty($request->getDestPostcode()) || empty($request->getDestCountryId())) {
+        if (empty($request->getDestPostcode()) || empty($request->getDestCountryId())) {
             return false;
-        }*/
+        }
+
         $getQuotesFromSession = $this->quotesFromSession();
         if (null !== $getQuotesFromSession) {
             return $getQuotesFromSession;
@@ -259,6 +251,7 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
         if (empty($requestArr)) {
             return false;
         }
+        
         $url = EnConstants::QUOTES_URL;
         $quotes = $this->dataHelper->cerasisSendCurlRequest($url, $requestArr);
         // Debug point will print data if en_print_query=1
@@ -275,8 +268,8 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
         }
 
         $quotesResult = $this->manageAllQuotes->getQuotesResultArr($quotes);
-        $this->session->setEnShippingQuotes($quotesResult);
 
+        $this->session->setEnShippingQuotes($quotesResult);
         return (!empty($quotesResult)) ? $this->setCarrierRates($quotesResult) : '';
     }
 
@@ -324,7 +317,9 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
                 $originAddress = $this->shipmentPkg->cerasisOriginAddress($request, $_product, $receiverZipCode);
                 $package['origin'][$_product->getId()] = $originAddress;
 
-                $orderWidget[$originAddress['senderZip']]['origin'] = $originAddress;
+                if(isset($originAddress['senderZip'])){
+                    $orderWidget[$originAddress['senderZip']]['origin'] = $originAddress;
+                }
 
                 $weight = $this->getFtLbsUnit($_product->getWeight(), 'w');
                 $length = $this->getFtLbsUnit($this->getDims($_product, 'length'), 'd');
@@ -345,13 +340,16 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
                     'lineItemWidth' => number_format($width, 2, '.', ''),
                     'lineItemHeight' => number_format($height, 2, '.', ''),
                     'isHazmatLineItem' => $setHzAndIns['hazmat'],
+                    'isPalletLineItem' => $_product->getData('en_is_pallet') ? 'Y' : 'N',
                     'product_insurance_active' => $setHzAndIns['insurance'],
                     'shipBinAlone' => $_product->getData('en_own_package'),
                     'vertical_rotation' => $_product->getData('en_vertical_rotation'),
                 ];
 
                 $package['items'][$_product->getId()] = $lineItem;
-                $orderWidget[$originAddress['senderZip']]['item'][] = $package['items'][$_product->getId()];
+                if(isset($originAddress['senderZip'])){
+                    $orderWidget[$originAddress['senderZip']]['item'][] = $package['items'][$_product->getId()];
+                }
             }
         }
 
@@ -374,6 +372,10 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
      */
     public function getFtLbsUnit($value, $entity)
     {
+        if(empty($value)){
+            return 0;
+        }
+
         if ($this->weightUnit === 'kgs') {
 
             switch ($entity) {
@@ -387,7 +389,7 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
             }
         }
 
-        return $value;
+        return (float) $value;
     }
 
     /**
@@ -476,8 +478,12 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
      */
     private function getDims($_product, $dimOf)
     {
-        $prefix = ($this->mageVersion < '2.2.5' || $this->mageVersion > '2.3.2') ? 'en_' : 'ts_dimensions_';
-        return $_product->getData($prefix.$dimOf);
+        $dimValue = $_product->getData('ts_dimensions_'.$dimOf);
+        if($dimValue != null){
+            return $dimValue;
+        }
+
+        return $_product->getData('en_'.$dimOf);
     }
 
     public function cerasisGetConfigVal()
@@ -521,7 +527,7 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
                 'DHRN' => __('Dohrn Transfer Company'),
                 'EXLA' => __('Estes Express Lines'),
                 'EXLA-ENVOY' => __('Estes Envoy (E)'),
-                'FXNL' => __('FedExFreightEconomy'),
+                'FXNL' => __('FedEx Freight Economy'),
                 'HJBT-DEMO' => __('J.B. Hunt - TRUCKLOAD'),
                 'KNIT-DEMO' => __('Knight Transportation - TRUCKLOAD'),
                 'LKVL' => __('Lakeville Motor Express Inc'),
@@ -537,9 +543,9 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
                 'RDFS' => __('Roadrunner Transportation Services'),
                 'SAIA' => __('Saia, Inc.'),
                 'SEFL' => __('Southeastern Freight Lines'),
-                'UPGF' => __('UPS Freight'),
-                'UPGF-CAUS' => __('UPS Freight-Canada to US'),
-                'UPGF-CN' => __('UPS Freight-Canada'),
+                'UPGF' => __('TForce Freight'),
+                'UPGF-CAUS' => __('TForce Freight-Canada to US'),
+                'UPGF-CN' => __('TForce Freight-Canada'),
                 'HMES' => __('USF Holland LLC'),
                 'WTVA' => __('Wilson Trucking'),
                 'RDWY' => __('YRC'),
@@ -577,6 +583,7 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
             $carriersArray = $this->registry->registry('enitureCarrierCodes');
             $carriersTitle = $this->registry->registry('enitureCarrierTitle');
             $result = $this->rateResultFactory->create();
+
             foreach ($quotes as $carrierKey => $quote) {
                 foreach ($quote as $key => $carrier) {
                     if (isset($carrier['code'])) {
@@ -602,8 +609,12 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
     public function printQuery()
     {
         $printQuery = 0;
-        parse_str(parse_url($this->request->getServer('HTTP_REFERER'), PHP_URL_QUERY), $query);
-
+        $query = [];
+        $url = parse_url($this->request->getServer('HTTP_REFERER'), PHP_URL_QUERY);
+        if(is_string($url)){
+            parse_str($url, $query);
+        }
+        
         if (!empty($query)) {
             $printQuery = ($query['en_print_query']) ?? 0;
         }

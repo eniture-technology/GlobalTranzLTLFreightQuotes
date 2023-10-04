@@ -163,7 +163,8 @@ class ResidentialAddressDetection extends Field
 
     public function ltlPlanNotice()
     {
-        return $this->dataHelper->LtlSetPlanNotice();
+        $planRefreshUrl = $this->getPlanRefreshUrl();
+        return $this->dataHelper->LtlSetPlanNotice($planRefreshUrl);
     }
 
     /**
@@ -177,5 +178,13 @@ class ResidentialAddressDetection extends Field
     public function apiEndpoint()
     {
         return $this->scopeConfig->getValue('gtConnSettings/first/endPoint', ScopeInterface::SCOPE_STORE) ?? '1';
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlanRefreshUrl()
+    {
+        return $this->getbaseUrl() . 'gtltlfreight/Test/PlanRefresh/';
     }
 }

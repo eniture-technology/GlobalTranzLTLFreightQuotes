@@ -55,13 +55,13 @@ class GetTrackingStatus extends Action
     public function execute()
     {
         $postData = $this->getRequest()->getPostValue();
-        $bolNumber = isset($postData['bolNumber']) ? filter_var($postData['bolNumber'], FILTER_SANITIZE_STRING) : '';
+        $bolNumber = isset($postData['bolNumber']) ? htmlspecialchars($postData['bolNumber'], ENT_QUOTES) : '';
         $reqData = [
             'dont_auth' => '1',
             'licence_key' => $this->scopeConfig->getValue('gtConnSettings/first/licnsKey', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
             'server_name' => $_SERVER['SERVER_NAME'],
             'carrierName' => 'cerasis',
-            'carrier_mode' => isset($postData['action']) ? filter_var($postData['action'], FILTER_SANITIZE_STRING) : '',
+            'carrier_mode' => isset($postData['action']) ? htmlspecialchars($postData['action'], ENT_QUOTES) : '',
             'shipperID' => $this->scopeConfig->getValue('gtConnSettings/first/cerasisltlshipperID', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
             'username' => $this->scopeConfig->getValue('gtConnSettings/first/cerasisltlusername', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
             'password' => $this->scopeConfig->getValue('gtConnSettings/first/cerasisltlPassword', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),

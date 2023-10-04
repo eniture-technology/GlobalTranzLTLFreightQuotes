@@ -3,7 +3,7 @@
     <body>
 
         <referenceContainer name="cart.summary">
-            <block class="\Magento\Framework\View\Element\Template" name="shiiping_address" after="shipping" template="Eniture_GlobalTranzLTLFreightQuotes::estimaterate.phtml"/>
+            <block class="Magento\Framework\View\Element\Template" name="shiiping_address" after="shipping" template="Eniture_GlobalTranzLTLFreightQuotes::estimaterate.phtml"/>
         </referenceContainer>
 
     </body>

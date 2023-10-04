@@ -1,15 +1,12 @@
 <?php
-
-
 namespace Eniture\GlobalTranzLTLFreightQuotes\Model\Source;
-
 
 class GlobalTranzCarriers
 {
     public static function getCarriersArray()
     {
         return [
-            'UPGF' => 'UPS Freight',
+            'UPGF' => 'TForce Freight',
             'FXNL' => 'FedEx Freight Economy',
             'FXFE' => 'FedEx Freight Priority',
             'EXLA' => 'Estes Express',

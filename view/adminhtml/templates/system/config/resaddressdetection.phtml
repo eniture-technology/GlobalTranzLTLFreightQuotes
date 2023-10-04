@@ -12,18 +12,15 @@
         });
 
         $("#gtQuoteSetting_fourth_shipDays").attr('size', '5');
-
+        let shippingSrvc = $('#gtQuoteSetting_fourth_shippingService');
+        let ratingMthd   = $('#gtQuoteSetting_fourth_ratingMethod');
+        
         switch (endPoint) {
             //    Case for Cerasis
             case '1':
                 $('.if_ep_gt').closest('tr').hide();
-                let shippingSrvc = $('#gtQuoteSetting_fourth_shippingService');
-                let ratingMthd   = $('#gtQuoteSetting_fourth_ratingMethod');
-
-
-                var interval = null;
-                interval = setInterval(manipulateFields, 1000);
-
+                
+                let interval = setInterval(manipulateFields, 1000);
                 function manipulateFields() {
                     let shipVal = shippingSrvc.val();
                     let ratVal  = ratingMthd.val();
@@ -48,13 +45,32 @@
                 });
                 break;
 
-
             //    Case for GlobalTranz
             case '2':
                 $('.if_ep_cr').closest('tr').hide();
                 $('.if_fm').closest('tr').hide();
                 showFmLabelAs(0);
                 $("#gtQuoteSetting_fourth_gtLtlQuoteServices").attr('size', '2');
+                break;
+
+            // case for new GTZ API
+            case '3':
+                $('.if_ep_gt').closest('tr').hide();
+                $('.hide_if_nap').closest('tr').hide();
+
+                let intervalNewAPI = setInterval(manipulateNewAPIFields, 1000);
+                function manipulateNewAPIFields() {
+                    let ratVal  = ratingMthd.val();
+                    ratingMethod(ratVal, '1');
+                    clearInterval(intervalNewAPI);
+                }
+
+                // Bind function on change
+                ratingMthd.on('change', function (){
+                    let ratVal  = this.value;
+                    ratingMethod(ratVal, '1');
+                });
+
                 break;
         }
 

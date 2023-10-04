@@ -95,8 +95,8 @@ class BillOfLadding extends Action
         $postData = $this->getRequest()->getPostValue();
         $orderId = $postData['orderId'];
         $printBolAjaxUrl = filter_var($postData['printBolAjaxUrl'], FILTER_SANITIZE_URL);
-        $this->senderName = isset($postData['senderName']) ? filter_var($postData['senderName'], FILTER_SANITIZE_STRING) : '';
-        $this->senderAddress = isset($postData['senderAddress']) ? filter_var($postData['senderAddress'], FILTER_SANITIZE_STRING) : '';
+        $this->senderName = isset($postData['senderName']) ? htmlspecialchars($postData['senderName'], ENT_QUOTES) : '';
+        $this->senderAddress = isset($postData['senderAddress']) ? htmlspecialchars($postData['senderAddress'], ENT_QUOTES) : '';
         $bolBase64 = [];
 
         $BOLTable = $this->tableNames['BOL'];
@@ -219,10 +219,10 @@ class BillOfLadding extends Action
             $package['items'][] = [
                 'piecesOfLineItem' => (int)$item->getQtyOrdered(),
                 'lineItemClass' => $product['freightClass'],
-                'lineItemWeight' => number_format($item->getWeight(), 2, '.', ''),
-                'lineItemLength' => number_format($product['length'], 2, '.', ''),
-                'lineItemWidth' => number_format($product['width'], 2, '.', ''),
-                'lineItemHeight' => number_format($product['height'], 2, '.', ''),
+                'lineItemWeight' => number_format((float) $item->getWeight(), 2, '.', ''),
+                'lineItemLength' => number_format((float) $product['length'], 2, '.', ''),
+                'lineItemWidth' => number_format((float) $product['width'], 2, '.', ''),
+                'lineItemHeight' => number_format((float) $product['height'], 2, '.', ''),
                 'lineItemPackageCode' => 'PLT',
                 'hazmat' => 0,
                 'description' => 'TEST', // optional

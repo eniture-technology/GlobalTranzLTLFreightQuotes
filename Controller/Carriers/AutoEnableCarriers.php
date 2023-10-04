@@ -44,7 +44,7 @@ class AutoEnableCarriers extends Action
     {
         $data = [];
         foreach ($this->getRequest()->getParams() as $key => $post) {
-            $data[$key] = filter_var($post, FILTER_SANITIZE_STRING);
+            $data[$key] = htmlspecialchars($post, ENT_QUOTES);
         }
 
         $this->configWriter->save('gtLtlCarriers/second/autoEnable', json_encode($data['autoEnable']), $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $scopeId = 0);

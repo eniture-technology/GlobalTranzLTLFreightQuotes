@@ -37,6 +37,15 @@ function gtTestConnectionAjaxCall($, ajaxURL) {
             customerID: $(common + 'gtLtlCustomerId').val(),
             pluginLicenceKey: $(common + 'licnsKey').val()
         };
+    } else if (endPoint === '3') {    //For Worldwide LTL
+        credentials = {
+            carrierName : 'wweLTL',
+            username: $(common + 'usernameNewAPI').val(),
+            password: $(common + 'passwordNewAPI').val(),
+            clientId: $(common + 'clientId').val(),
+            clientSecret: $(common + 'clientSecret').val(),
+            pluginLicenceKey: $(common + 'licnsKey').val()
+        };
     }
     gtLtAjaxRequest(credentials, ajaxURL, gtConnectSuccessFunction);
 }
@@ -56,3 +65,22 @@ function gtConnectSuccessFunction(data) {
         gtLtResponseMessage('gt-response-box', 'error', errorText);
     }
 }
+
+/**
+ * Test connection ajax call
+ * @param {object} $
+ * @param {string} ajaxURL
+ * @returns {function}
+ */
+function gtzLtlPlanRefresh(e){
+    let ajaxURL = e.getAttribute('planRefAjaxUrl');
+    let parameters = {};
+    gtLtAjaxRequest(parameters, ajaxURL, gtzLtlPlanRefreshResponse);
+}
+
+/**
+ * Handel response
+ * @param {object} data
+ * @returns {void}
+ */
+function gtzLtlPlanRefreshResponse(data){}

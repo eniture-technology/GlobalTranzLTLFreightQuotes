@@ -82,24 +82,31 @@ class TestConnection extends Field
      */
     public function getPlanNotice()
     {
-        return $this->dataHelper->ltlSetPlanNotice();
+        $planRefreshUrl = $this->getPlanRefreshUrl();
+        return $this->dataHelper->ltlSetPlanNotice($planRefreshUrl);
     }
 
     public function gtLtlConnMsgs()
     {
-        $eP = $this->scopeConfig->getValue('gtConnSettings/first/endPoint', ScopeInterface::SCOPE_STORE) ?? '1';
+        $eP = $this->scopeConfig->getValue('gtConnSettings/first/endPoint', ScopeInterface::SCOPE_STORE) ?? 1;
         $msgCe = 'You must have a Cerasis account to use this application. If you do not have one contact Cerasis at 800-734-5351 or <a target="_blank" href="http://cerasis.com/contact/transportation-management-consultation/">register online</a>';
 
         $msgGt = 'You must have a GlobalTranz account to use this application. If you do not have one contact GlobalTranz at 866-275-1407 or <a target="_blank" href="https://www.globaltranz.com/">register online</a>';
 
-        $msg = $eP == 2 ? $msgGt : $msgCe;
+        $msg = $eP == 1 ? $msgCe : $msgGt ;
         $div = '<div class="message message-notice notice gtLt-conn-setting-note"><div data-ui-id="messages-message-notice">'.$msg.'</div></div>';
-
-
 
         return ['msgCe' => $msgCe,
                 'msgGt' => $msgGt,
                 'div' => $div
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlanRefreshUrl()
+    {
+        return $this->getbaseUrl() . 'gtltlfreight/Test/PlanRefresh/';
     }
 }

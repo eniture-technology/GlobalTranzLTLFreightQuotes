@@ -79,7 +79,7 @@ class GlobalTranzGenerateRequestData
             'serverName' => $this->request->getServer('SERVER_NAME'),
             'carrierMode' => 'pro', // use test / pro
             'quotestType' => 'ltl', // ltl / small
-            'version' => '2.0',
+            'version' => '3.0',
             'returnQuotesOnExceedWeight' => $this->getConfigData('weightExeeds'),
             'liftGateAsAnOption' => $this->getConfigData('offerLiftGate'),
             'api' => $this->getApiInfoArr(),
@@ -101,7 +101,9 @@ class GlobalTranzGenerateRequestData
         if (count($originArr['originAddress']) > 1) {
             $whIDs = [];
             foreach ($originArr['originAddress'] as $wh) {
-                $whIDs[] = $wh['locationId'];
+                if(isset($wh['locationId'])){
+                    $whIDs[] = $wh['locationId'];
+                }
             }
             if (count(array_unique($whIDs)) > 1) {
                 foreach ($originArr['originAddress'] as $id => $wh) {
@@ -113,10 +115,13 @@ class GlobalTranzGenerateRequestData
         }
         $carriers = $this->registry->registry('enitureCarriers');
         $index = 'globalTranz';
-        if ($this->getConfigData('endPoint') == 1) {
+        $endPoint = $this->getConfigData('endPoint');
+        if ($endPoint == 1) {
             unset($carriers['globalTranz']);
             $index = 'cerasis';
-
+        }else if ($endPoint == 3) {
+            unset($carriers['globalTranz']);
+            $index = 'globalTranzN';
         }
         $carriers[$index] = $originArr;
         $receiverAddress = $this->getReceiverData($request);
@@ -133,7 +138,7 @@ class GlobalTranzGenerateRequestData
         $smartPost = $this->registry->registry('fedexSmartPost');
 
         return [
-            'apiVersion' => '2.0',
+            'apiVersion' => '3.0',
             'platform' => 'magento2',
             'binPackagingMultiCarrier' => $this->binPackSuspend(),
             'autoResidentials' => $autoResidential,
@@ -253,6 +258,22 @@ class GlobalTranzGenerateRequestData
                 'finalMileService'  => $finalMileServices[$finalMileService],
                 'cerasisApiVersion' => '2.0'
             ];
+        }else if($endPoint == 3){
+
+            $residential = !$this->autoResidentialDelivery() ? $this->getConfigData('residentialDlvry') : 0;
+            $liftGate = ($this->getConfigData('liftGate') || $this->getConfigData('offerLiftGate')) ? 1 : 0;
+
+            $apiArray =  [
+                'speed_freight_username'   => $this->getConfigData('usernameNewAPI'),
+                'speed_freight_password'   => $this->getConfigData('passwordNewAPI'),
+                'clientId'  => $this->getConfigData('clientId'),
+                'clientSecret' => $this->getConfigData('clientSecret'),
+                'ApiVersion' => '2.0',
+                'isUnishipperNewApi' => 'yes',
+                'speed_freight_residential_delivery' => $residential ? 'Y' : 'N',
+                'speed_freight_lift_gate_delivery' => $liftGate ? 'Y' : 'N',
+            ];
+
         } else {
             $apiArray =  [
                 'username'   => $this->getConfigData('gtLtlUsername'),
@@ -260,7 +281,7 @@ class GlobalTranzGenerateRequestData
                 'accessKey'  => $this->getConfigData('gtLtlAuthKey'),
                 'customerId' => $this->getConfigData('gtLtlCustomerId'),
                 'accessLevel' => 'pro', // or test (in parallet to API credentials in GT only)
-                'version' => '2.0'
+                'version' => '2.0',
             ];
         }
         //$apiArray['cerasisApiVersion'] = '2.0';
@@ -327,11 +348,12 @@ class GlobalTranzGenerateRequestData
         if ($endPoint == 2) {
             $country = $country == 'CA' ? 'CAN' : 'USA';
         }
+        $receiverZip = (!empty($request->getDestPostcode())) ? preg_replace('/\s+/', '', $request->getDestPostcode()) : '';
         return [
             'addressLine' => $request->getDestStreet(),
             'receiverCity' => $request->getDestCity(),
             'receiverState' => $request->getDestRegionCode(),
-            'receiverZip' => preg_replace('/\s+/', '', $request->getDestPostcode()),
+            'receiverZip' => $receiverZip,
             'receiverCountryCode' => $country,
             'defaultRADAddressType' => $addressType ?? 'residential', //get value from RAD
         ];

@@ -8,15 +8,15 @@ $msgGt   = $connMsgs['msgGt'];
 <script>
     require(['jquery','domReady!'], function($){
         let carrierDiv = '#gtConnSettings_first-head';
-        gtLtNotesToggleHandling($, '<?= $block->escapeHtml($connMsg, ['a', 'div']); ?>', '.gtLt-conn-setting-note', carrierDiv);
-        gtLtCurrentPlanNote($, '<?= $block->escapeHtml($planMsg, ['a', 'div']); ?>', carrierDiv);
+        gtLtNotesToggleHandling($, '<?= $connMsg; ?>', '.gtLt-conn-setting-note', carrierDiv);
+        gtLtCurrentPlanNote($, '<?= $planMsg; ?>', carrierDiv);
 
         $("#gtConnSettings_first_endPoint").on("change", function (){
             let msg = '';
             if (this.value === '1'){
-                msg = '<?= $block->escapeHtml($msgCe, ['a', 'div']); ?>';
+                msg = '<?= $msgCe; ?>';
             }else {
-                msg = '<?= $block->escapeHtml($msgGt, ['a', 'div']); ?>';
+                msg = '<?= $msgGt; ?>';
             }
             $(".gtLt-conn-setting-note div").html(msg);
         });

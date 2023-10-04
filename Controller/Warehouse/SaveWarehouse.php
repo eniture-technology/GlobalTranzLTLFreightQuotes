@@ -38,13 +38,13 @@ class SaveWarehouse extends Action
      */
     public function execute()
     {
-        $insertQry = 0;
+        $insertQry = ['insertId' => 0, 'lastId' => 0];
         $updateQry = 0;
         $msg = 'Warehouse already exists.';
         $updateInSpLd = 'no';
         $saveWhData = [];
         foreach ($this->getRequest()->getParams() as $key => $post) {
-            $saveWhData[$key] = filter_var($post, FILTER_SANITIZE_STRING);
+            $saveWhData[$key] = htmlspecialchars($post, ENT_QUOTES);
         }
         $inputDataArr = $this->dataHelper->originArray($saveWhData);
         $validateData = $this->dataHelper->LTLValidatedPostData($inputDataArr);

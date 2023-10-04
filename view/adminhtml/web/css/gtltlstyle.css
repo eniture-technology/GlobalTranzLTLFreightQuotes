@@ -492,7 +492,7 @@ button.en-btn:focus {
 .refresh_carriers {
     width: 20%;
     float: right;
-    margin: 0px -15px 20px !important
+    margin: 0px -54px 20px !important
 }
 
 .current_status span {
@@ -661,8 +661,8 @@ label[for="gtQuoteSetting_fourth_symbolicHndlngFee"] {
     padding-right: 3px;
 }
 
- label[for="gtConnSettings_first_cerasisltlshipperID"]:after, label[for="gtConnSettings_first_cerasisltlusername"]:after, label[for="gtConnSettings_first_cerasisltlPassword"]:after, label[for="gtConnSettings_first_cerasisltlAccessKey"]:after,label[for="gtConnSettings_first_gtLtlUsername"]:after, label[for="gtConnSettings_first_gtLtlPassword"]:after, label[for="gtConnSettings_first_gtLtlAuthKey"]:after,
- label[for="gtConnSettings_first_licnsKey"]:after {
+ label[for="gtConnSettings_first_cerasisltlshipperID"]:not(.mage-error):after, label[for="gtConnSettings_first_cerasisltlusername"]:not(.mage-error):after, label[for="gtConnSettings_first_cerasisltlPassword"]:not(.mage-error):after, label[for="gtConnSettings_first_cerasisltlAccessKey"]:not(.mage-error):after,label[for="gtConnSettings_first_gtLtlUsername"]:not(.mage-error):after, label[for="gtConnSettings_first_gtLtlPassword"]:not(.mage-error):after, label[for="gtConnSettings_first_gtLtlAuthKey"]:not(.mage-error):after,
+ label[for="gtConnSettings_first_licnsKey"]:not(.mage-error):after, label[for="gtConnSettings_first_clientId"]:not(.mage-error):after, label[for="gtConnSettings_first_clientSecret"]:not(.mage-error):after {
     content: '*';
     color: red;
     padding: 5px;

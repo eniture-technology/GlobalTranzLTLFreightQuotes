@@ -49,9 +49,10 @@
             if ($("#block-summary [name=country_id]").length) {
 
                 $('[name=region_id], [name=postcode], [name=city]').unbind();
-                $('[name=country_id], [name=region_id], [name=postcode], [name=city]').each(function (index) {
-                    ko.cleanNode(this);
-                });
+                // Why comment: Country dropdown change on cart page doesn't effect/change state dropdown
+                // $('[name=country_id], [name=region_id], [name=postcode], [name=city]').each(function (index) {
+                //     ko.cleanNode(this);
+                // });
                 $('#getrate').prop('disabled', false);
                 clearInterval(interval);
             }

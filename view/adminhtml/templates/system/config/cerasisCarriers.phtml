@@ -53,6 +53,7 @@
         </thead>
         <tbody>
         <?php
+
         if (isset($this->carriersList->carriers) && !empty($this->carriersList->carriers)) {
             $selectedCarriers = (array)$this->selectedCarriers;
             foreach ($this->carriersList->carriers as $key => $carriers) {

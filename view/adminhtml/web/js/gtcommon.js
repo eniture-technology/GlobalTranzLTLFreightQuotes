@@ -3,7 +3,7 @@
  * @type type
  */
 
-require([
+ require([
     'jquery',
     'jquery/validate',
     'domReady!'], function ($) {
@@ -46,21 +46,26 @@ require([
     $('#gtQuoteSetting_fourth_shippingService').on('change', function () {
         let option = $('#gtQuoteSetting_fourth_shippingService option:selected').val();
         if (option == 2){
-            $('#row_gtQuoteSetting_fourth_enableCuttOff').hide()
-            $('#row_gtQuoteSetting_fourth_cutOffTime').hide()
-            $('#row_gtQuoteSetting_fourth_offsetDays').hide()
-            $('#row_gtQuoteSetting_fourth_shipDays').hide()
+            $('#row_gtQuoteSetting_fourth_enableCuttOff').val('0');
+            $('#row_gtQuoteSetting_fourth_enableCuttOff').hide();
+            $('#row_gtQuoteSetting_fourth_cutOffTime').hide();
+            $('#row_gtQuoteSetting_fourth_offsetDays').hide();
+            $('#row_gtQuoteSetting_fourth_shipDays').hide();
+            if($('#suspend-rad-use').length)
+            {
+                $('#suspend-rad-use').prop('checked', true);
+            }
         }else{
             $('#row_gtQuoteSetting_fourth_enableCuttOff').show()
-            let cutOffTime = $('#gtQuoteSetting_fourth_enableCuttOff option:selected').val()
+            let cutOffTime = $('#gtQuoteSetting_fourth_enableCuttOff option:selected').val();
             if (cutOffTime == 1){
-                $('#row_gtQuoteSetting_fourth_cutOffTime').show()
-                $('#row_gtQuoteSetting_fourth_offsetDays').show()
-                $('#row_gtQuoteSetting_fourth_shipDays').show()
+                $('#row_gtQuoteSetting_fourth_cutOffTime').show();
+                $('#row_gtQuoteSetting_fourth_offsetDays').show();
+                $('#row_gtQuoteSetting_fourth_shipDays').show();
             }else{
-                $('#row_gtQuoteSetting_fourth_cutOffTime').hide()
-                $('#row_gtQuoteSetting_fourth_offsetDays').hide()
-                $('#row_gtQuoteSetting_fourth_shipDays').hide()
+                $('#row_gtQuoteSetting_fourth_cutOffTime').hide();
+                $('#row_gtQuoteSetting_fourth_offsetDays').hide();
+                $('#row_gtQuoteSetting_fourth_shipDays').hide();
             }
         }
         //gtChangeLiftgateOption('#gtQuoteSetting_fourth_liftGate', (this.value == '1') ? '1' : '0');
@@ -80,14 +85,12 @@ function gtChangeLiftgateOption(selectId, optionVal) {
 /**
  * Add label to rating method
  */
-
 function gtRatingMethodComment(endpoint = null) {
-    console.log('endpoint ', endpoint);
     const ratingMethod = jQuery('#gtQuoteSetting_fourth_ratingMethod').val();
     if (ratingMethod == 3) {
         jQuery('#gtQuoteSetting_fourth_ratingMethod').next().text('Displays a single rate based on an average of a specified number of least expensive options.');
-        console.log('#gtQuoteSetting_fourth_gtLtlQtrLabelAs ', jQuery('#gtQuoteSetting_fourth_gtLtlQtrLabelAs').val());
-        if (endpoint !== null && endpoint == 2){
+        
+        if (endpoint !== null && (endpoint == 2 || endpoint == 3)){
             jQuery('#gtQuoteSetting_fourth_options').next().text('Number of options to display in the shopping cart.');
         }else{
             jQuery('#gtQuoteSetting_fourth_options').next().text('Number of options to include in the calculation of the average.');

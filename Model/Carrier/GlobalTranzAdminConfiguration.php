@@ -65,11 +65,13 @@ class GlobalTranzAdminConfiguration
             $codesArray = [];
             $codesArray['globalTranz'] = $arrValue;
             $codesArray['cerasis'] = $arrValue;  //Custom change for this extension only
+            $codesArray['globalTranzN'] = $arrValue;  //Custom change for this extension only
             $this->registry->register($globArrayName, $codesArray);
         } else {
             $codesArray = $this->registry->registry($globArrayName);
             $codesArray['globalTranz'] = $arrValue;
             $codesArray['cerasis'] = $arrValue;  //Custom change for this extension only
+            $codesArray['globalTranzN'] = $arrValue;  //Custom change for this extension only
             $this->registry->unregister($globArrayName);
             $this->registry->register($globArrayName, $codesArray);
         }

@@ -53,10 +53,15 @@ class CerasisGetCarriers extends Action
     public function execute()
     {
         $data = [];
+        $autoEnable = '';
         foreach ($this->getRequest()->getParams() as $key => $post) {
-            $data[$key] = filter_var($post, FILTER_SANITIZE_STRING);
+            $data[$key] = htmlspecialchars($post, ENT_QUOTES);
         }
-        $autoEnable = json_decode($this->scopeConfig->getValue('gtLtlCarriers/second/autoEnable', ScopeInterface::SCOPE_STORE));
+
+        $autoEnableEnco = $this->scopeConfig->getValue('gtLtlCarriers/second/autoEnable', ScopeInterface::SCOPE_STORE);
+        if(!empty($autoEnableEnco) && is_string($autoEnableEnco)){
+            $autoEnable = json_decode($autoEnableEnco);
+        }
 
         $req = $this->dataHelper->getCerasisCarriersReq($data['action']);
         $carriersRes = $this->dataHelper->cerasisSendCurlRequest(EnConstants::INDEX, $req);
@@ -74,8 +79,21 @@ class CerasisGetCarriers extends Action
      */
     public function updateNewCarriers($carriersRes)
     {
-        $selectedCarriers = (array)json_decode($this->scopeConfig->getValue('gtLtlCarriers/second/selectedCarriers', ScopeInterface::SCOPE_STORE));
-        $previousCarriers = (array)json_decode($this->scopeConfig->getValue('gtLtlCarriers/second/carriers', ScopeInterface::SCOPE_STORE));
+
+        $selectedCarriersEnco = $this->scopeConfig->getValue('gtLtlCarriers/second/selectedCarriers', ScopeInterface::SCOPE_STORE);
+        if(!empty($selectedCarriersEnco) && is_string($selectedCarriersEnco)){
+            $selectedCarriers = (array)json_decode($selectedCarriersEnco);
+        }else{
+            $selectedCarriers = [];
+        }
+
+        $previousCarriersEnco = $this->scopeConfig->getValue('gtLtlCarriers/second/carriers', ScopeInterface::SCOPE_STORE);
+        if(!empty($previousCarriersEnco) && is_string($previousCarriersEnco)){
+            $previousCarriers = (array)json_decode($previousCarriersEnco);
+        }else{
+            $previousCarriers = [];
+        }
+        
         $newSelected = $oldSavedCarriers = [];
 
         foreach ($previousCarriers as $key => $data) {

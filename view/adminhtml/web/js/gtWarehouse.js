@@ -176,7 +176,7 @@ function gtLtZipMilesValid()
 
 function gtLtWarehouseSaveResSettings(data)
 {
-    console.log(data);
+    gtLtAddWarehouseRestriction(data.canAddWh);
     if (data.insert_qry == 1) {
         jQuery('#append-warehouse tr:last').after(
             '<tr id="row_' + data.id + '" data-id="' + data.id + '">' + gtLtGetRowData(data, 'wh') + '</tr>'
@@ -188,7 +188,7 @@ function gtLtWarehouseSaveResSettings(data)
         gtLtResponseMessage('gtLt-wh-modal-msg', 'error', data.msg);
         return false;
     }
-    gtLtAddWarehouseRestriction(data.canAddWh);
+
     gtLtResponseMessage('gtLt-wh-msg', 'success', data.msg);
     return true;
 }

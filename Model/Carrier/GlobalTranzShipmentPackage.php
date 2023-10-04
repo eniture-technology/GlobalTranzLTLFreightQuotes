@@ -79,6 +79,8 @@ class GlobalTranzShipmentPackage
         }
         if (!empty($origin)) {
             return $this->multiWarehouse($origin, $receiverZipCode);
+        }else{
+            return [];
         }
     }
 
@@ -231,8 +233,13 @@ class GlobalTranzShipmentPackage
      */
     public function checkPostalCodeMatch($receiverZipCode, $originZipCodes)
     {
-        $receiverZipCode = preg_replace('/\s+/', '', $receiverZipCode);
-        $originZipCodes = preg_replace('/\s+/', '', $originZipCodes);
-        return in_array($receiverZipCode, explode(',', $originZipCodes)) ? 1 : 0;
+        if(!empty($receiverZipCode) && !empty($originZipCodes)){
+            $receiverZipCode = preg_replace('/\s+/', '', $receiverZipCode);
+            $originZipCodes = preg_replace('/\s+/', '', $originZipCodes);
+            return in_array($receiverZipCode, explode(',', $originZipCodes)) ? 1 : 0;
+        }else{
+            return 0;
+        }
+        
     }
 }

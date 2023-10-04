@@ -125,8 +125,6 @@ class Carriers extends Field
         $this->selectedCarriers = json_decode($this->getConfigData('selectedGtCarriers'));
         //$this->selectedCarriers = [];
         $this->carriersList = GlobalTranzCarriers::getCarriersArray();
-
-//        $this->carriersList = json_decode($carriers);
     }
 
     public function setConfigData()
@@ -156,7 +154,8 @@ class Carriers extends Field
      */
     public function getPlanNotice()
     {
-        return $this->dataHelper->LtlSetPlanNotice();
+        $planRefreshUrl = $this->getPlanRefreshUrl();
+        return $this->dataHelper->LtlSetPlanNotice($planRefreshUrl);
     }
 
     public function getImgUrl($name)
@@ -169,5 +168,13 @@ class Carriers extends Field
             $url = $this->getViewFileUrl($path);
         }
         return $url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlanRefreshUrl()
+    {
+        return $this->getbaseUrl() . 'gtltlfreight/Test/PlanRefresh/';
     }
 }

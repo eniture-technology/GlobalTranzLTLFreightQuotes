@@ -125,6 +125,6 @@ class OrderDetailWidget extends Template implements TabInterface
     {
         // customtab is a adminhtml router we're about to define
         // the full route can really be whatever you want
-        return $this->getUrl('orderdetailwidget/*/OrderDetailWidget', ['_current' => true]);
+        return $this->getUrl('orderdetailwidget_gtltl/*/OrderDetailWidget', ['_current' => true]);
     }
 }

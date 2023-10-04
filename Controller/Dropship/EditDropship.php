@@ -32,7 +32,7 @@ class EditDropship extends Action
     {
         $editDsData = [];
         foreach ($this->getRequest()->getParams() as $key => $post) {
-            $editDsData[$key] = filter_var($post, FILTER_SANITIZE_STRING);
+            $editDsData[$key] = htmlspecialchars($post, ENT_QUOTES);
         }
 
         $getDropShipId = $editDsData['edit_id'];
