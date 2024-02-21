@@ -13,7 +13,6 @@ use Magento\Store\Model\ScopeInterface;
 
 class Carriers extends Field
 {
-    const CER_TEMPLATE = 'system/config/cerasisCarriers.phtml';
     const GT_TEMPLATE = 'system/config/globaltranzCarriers.phtml';
 
     public $dataHelper;
@@ -67,11 +66,9 @@ class Carriers extends Field
 
     protected function _prepareLayout()
     {
-        $template = $this->apiEndpoint() == 1 ? static::CER_TEMPLATE : self::GT_TEMPLATE;
-
         parent::_prepareLayout();
         if (!$this->getTemplate()) {
-            $this->setTemplate($template);
+            $this->setTemplate(self::GT_TEMPLATE);
         }
         return $this;
     }
@@ -93,37 +90,16 @@ class Carriers extends Field
         return $this->getbaseUrl() . 'gtltlfreight/Carriers/AutoEnableCarriers/';
     }
 
-    public function apiEndpoint()
-    {
-        return $this->scopeConfig->getValue('gtConnSettings/first/endPoint', ScopeInterface::SCOPE_STORE) ?? '1';
-    }
-
     public function setCarriersData()
     {
         $this->imagesArray = GlobalTranzCarriers::getImagesArray();
         $this->clearMagentoCache();
-        if ($this->apiEndpoint() == 1) {
-            $this->getCerasisCarriersList();
-        } else {
-            $this->getGlobalTranzCarriersList();
-        }
-    }
-
-    public function getCerasisCarriersList()
-    {
-        $this->dataHelper->executeCronForGetCarriers();
-
-        $this->autoEnable = json_decode($this->getConfigData('autoEnable'));
-        $this->requestTime = json_decode($this->getConfigData('requestTime'));
-        $this->selectedCarriers = json_decode($this->getConfigData('selectedCarriers'));
-        $this->carriersList = json_decode($this->getConfigData('carriers'));
+        $this->getGlobalTranzCarriersList();
     }
 
     public function getGlobalTranzCarriersList()
     {
-//        $this->getViewFileUrl();
         $this->selectedCarriers = json_decode($this->getConfigData('selectedGtCarriers'));
-        //$this->selectedCarriers = [];
         $this->carriersList = GlobalTranzCarriers::getCarriersArray();
     }
 

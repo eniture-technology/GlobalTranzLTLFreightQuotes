@@ -498,7 +498,7 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
      */
     public function getAllowedMethods()
     {
-        $allowed = explode(',', $this->getConfigData('allowed_methods'));
+        $allowed = empty($this->getConfigData('allowed_methods')) ? [] : explode(',', $this->getConfigData('allowed_methods'));
         $arr = [];
         foreach ($allowed as $k) {
             $arr[$k] = $this->getCode('method', $k);

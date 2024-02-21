@@ -30,6 +30,7 @@ class GlobalTranzGenerateRequestData
      * @var object
      */
     private $timezone;
+    private $dataHelper;
 
     private $appConfigData = [];
 
@@ -116,10 +117,7 @@ class GlobalTranzGenerateRequestData
         $carriers = $this->registry->registry('enitureCarriers');
         $index = 'globalTranz';
         $endPoint = $this->getConfigData('endPoint');
-        if ($endPoint == 1) {
-            unset($carriers['globalTranz']);
-            $index = 'cerasis';
-        }else if ($endPoint == 3) {
+        if ($endPoint == 3) {
             unset($carriers['globalTranz']);
             $index = 'globalTranzN';
         }
@@ -227,38 +225,16 @@ class GlobalTranzGenerateRequestData
     public function getApiInfoArr()
     {
         $endPoint = $this->getConfigData('endPoint');
-        $defaults = [
-            'direction' => 'Dropship',    //Not used now
-            'billingType' => 'Prepaid',
-        ];
-        $defaults = $endPoint == 1 ? $defaults : [];
         $api = $this->getApiCreds($endPoint);
         $accessorials['accessorial'] = $this->getAccessorials($endPoint);
 
-        return array_merge($api, $defaults, $accessorials);
+        return array_merge($api, $accessorials);
     }
 
     public function getApiCreds($endPoint)
     {
         $apiArray = [];
-        if ($endPoint == 1) {
-            $isFinalMile = $this->getConfigData('shippingService') == 2;
-            $finalMileService = $isFinalMile ? $this->getConfigData('finalMileServices') : 0;
-            $finalMileServices = [  0 => '',
-                                    1 => 'THRSHLD_FM',
-                                    2 => 'ROOMCHC_FM',
-                                    3 => 'PREMIUM_FM',
-            ];
-            $apiArray =  [
-                'shipperID'         => $this->getConfigData('cerasisltlshipperID'),
-                'username'          => $this->getConfigData('cerasisltlusername'),
-                'password'          => $this->getConfigData('cerasisltlPassword'),
-                'accessKey'         => $this->getConfigData('cerasisltlAccessKey'),
-                'isFinalMile'       => $isFinalMile,
-                'finalMileService'  => $finalMileServices[$finalMileService],
-                'cerasisApiVersion' => '2.0'
-            ];
-        }else if($endPoint == 3){
+        if($endPoint == 3){
 
             $residential = !$this->autoResidentialDelivery() ? $this->getConfigData('residentialDlvry') : 0;
             $liftGate = ($this->getConfigData('liftGate') || $this->getConfigData('offerLiftGate')) ? 1 : 0;
@@ -284,7 +260,7 @@ class GlobalTranzGenerateRequestData
                 'version' => '2.0',
             ];
         }
-        //$apiArray['cerasisApiVersion'] = '2.0';
+        
         $cutOffData = $this->getCutoffData();
         return array_merge($apiArray, $cutOffData);
     }
@@ -293,13 +269,9 @@ class GlobalTranzGenerateRequestData
     {
         $residential = !$this->autoResidentialDelivery() ? $this->getConfigData('residentialDlvry') : 0;
         $liftGate = ($this->getConfigData('liftGate') || $this->getConfigData('offerLiftGate')) ? 1 : 0;
-        $isFmService = $this->getConfigData('shippingService') == 2;
 
         $accessorials = [];
-        if ($endPoint == 1 && !$isFmService) {
-            $residential ? array_push($accessorials, 'RESDEL') : '';
-            $liftGate ? array_push($accessorials, 'LFTGATDEST') : '';
-        } else if ($endPoint == 2) {
+        if ($endPoint == 2) {
             $residential ? $accessorials['RESD'] = '14' : '';
             $liftGate ? $accessorials['LGD'] = '12' : '';
         }
@@ -312,7 +284,7 @@ class GlobalTranzGenerateRequestData
         $isEligible = $this->getConfigData('plan') > 1 && $this->getConfigData('enableCuttOff');
         if ($isEligible) {
             $cutOffTime = str_replace(',' , ':', $this->getConfigData('cutOffTime'));
-            $shipDays   = explode(',' ,$this->getConfigData('shipDays'));
+            $shipDays   = empty($this->getConfigData('shipDays')) ? [] : explode(',' ,$this->getConfigData('shipDays'));
 
             $return = [ 'modifyShipmentDateTime' => '1',
                         'OrderCutoffTime'        => $cutOffTime,

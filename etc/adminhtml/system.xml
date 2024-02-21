@@ -68,41 +68,6 @@
                     </depends>
                 </field>
 
-<!--            Cerasis Fileds Start            -->
-                <field id="cerasisltlusername" translate="label" type="text" sortOrder="3" showInDefault="1"
-                       showInWebsite="1" showInStore="1">
-                    <label>Username</label>
-                    <validate>required-entry</validate>
-                    <depends>
-                        <field id="endPoint">1</field>
-                    </depends>
-                </field>
-                <field id="cerasisltlPassword" translate="label" type="text" sortOrder="4" showInDefault="1"
-                       showInWebsite="1" showInStore="1">
-                    <label>Password</label>
-                    <validate>required-entry</validate>
-                    <depends>
-                        <field id="endPoint">1</field>
-                    </depends>
-                </field>
-                <field id="cerasisltlAccessKey" translate="label" type="text" sortOrder="5" showInDefault="1"
-                       showInWebsite="1" showInStore="1">
-                    <label>Access Key</label>
-                    <validate>required-entry</validate>
-                    <depends>
-                        <field id="endPoint">1</field>
-                    </depends>
-                </field>
-                <field id="cerasisltlshipperID" translate="label" type="text" sortOrder="6" showInDefault="1"
-                       showInWebsite="1" showInStore="1">
-                    <label>Shipper ID</label>
-                    <validate>required-entry</validate>
-                    <depends>
-                        <field id="endPoint">1</field>
-                    </depends>
-                </field>
-<!--            Cerasis Fields End                  -->
-
 <!--            GlobalTranz Fileds Start            -->
                 <field id="gtLtlUsername" translate="label" type="text" sortOrder="3" showInDefault="1"
                        showInWebsite="1" showInStore="1">
@@ -192,56 +157,27 @@
                    showInStore="1">
                 <label>Quote Settings</label>
 
-                <field id="gtLtlLcrLabelAs" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Cheapest Rate Label As</label>
-                    <comment><![CDATA[What The User Sees During Checkout, e.g "Freight" Leave Blank to Display The Carrier Name.]]></comment>
-                    <frontend_class>if_ep_gt</frontend_class>
-                </field>
-
-                <field id="gtLtlQtrLabelAs" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Quickest Rate Label As</label>
-                    <comment><![CDATA[What The User Sees During Checkout, e.g "Freight" Leave Blank to Display The Carrier Name.]]></comment>
-                    <frontend_class>if_ep_gt</frontend_class>
-                </field>
-
-                <field id="gtLtlQuoteServices" translate="label" type="multiselect" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Quote Service Options</label>
-                    <source_model>Eniture\GlobalTranzLTLFreightQuotes\Model\Source\QuoteServiceOptions</source_model>
-                    <frontend_class>if_ep_gt</frontend_class>
-                    <can_be_empty>1</can_be_empty>
-                </field>
-
-                <field id="shippingService" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Shipping Service</label>
-                    <source_model>Eniture\GlobalTranzLTLFreightQuotes\Model\Source\ShippingService</source_model>
-                    <frontend_class>if_ep_cr hide_if_nap</frontend_class>
-                </field>
-
-
                 <field id="ratingMethod" translate="label" type="select" sortOrder="12" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Rating Method</label>
                     <source_model>Eniture\GlobalTranzLTLFreightQuotes\Model\Source\CerasisLtlRatingMethod</source_model>
-                    <comment><![CDATA[Displays list of specified number of least expensive options.]]></comment>
-                    <frontend_class>if_ep_cr hide_if_fm</frontend_class>
+                    <comment><![CDATA[Displays a list of a specified number of least expensive options.]]></comment>
                 </field>
 
                 <field id="options" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1"
                        showInStore="1">
-                    <label>Cheapest Options</label>
+                    <label>Number Of Options</label>
                     <source_model>Eniture\GlobalTranzLTLFreightQuotes\Model\Source\CerasisLtlCheapestOptions</source_model>
                     <comment><![CDATA[Number of options to display in the shopping cart.]]></comment>
-                    <frontend_class>if_ep_cr hide_if_fm if_rm_23</frontend_class>
-
+                    <frontend_class>if_rm_23</frontend_class>
                 </field>
 
                 <field id="labelAs" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1"
                        showInStore="1">
                     <label>Label As</label>
                     <comment>
-                        <![CDATA[What the user sees during checkout e.g. "Freight". Leave blank to display carrier name.]]></comment>
-                    <frontend_class>if_ep_cr hide_if_fm if_rm_13</frontend_class>
-
+                        <![CDATA[What the user sees during checkout, e.g. "Freight". Leave blank to display the carrier name.]]></comment>
+                    <frontend_class>if_rm_13</frontend_class>
                 </field>
 
                 <field id="dlrvyEstimates" translate="label" type="select" sortOrder="15" showInDefault="1"
@@ -249,7 +185,7 @@
                     <label>Show Delivery Estimate</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[Show Delivery Estimates With Shipping Services.]]></comment>
-                    <frontend_class>hide_if_fm if_rm_12</frontend_class>
+                    <frontend_class>if_rm_12</frontend_class>
                 </field>
                 <field id="enableCuttOff" translate="label" type="select" sortOrder="16" showInDefault="1"
                        showInWebsite="1" showInStore="1">
@@ -291,14 +227,12 @@
                        showInWebsite="1" showInStore="1">
                     <label>Always Quote Residential Delivery</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <frontend_class>hide_if_fm</frontend_class>
                 </field>
 
                 <field id="residentialAddressDetect" translate="label" type="select" sortOrder="21" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Residential address detection</label>
                     <frontend_model>Eniture\GlobalTranzLTLFreightQuotes\Block\System\Config\ResidentialAddressDetection</frontend_model>
-                    <frontend_class>hide_if_fm</frontend_class>
                 </field>
 
                 <field id="liftGate" translate="label" type="select" sortOrder="22" showInDefault="1" showInWebsite="1"
@@ -306,7 +240,6 @@
                     <label>Always quote lift gate delivery</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[Lift Gate Delivery.]]></comment>
-                    <frontend_class>hide_if_fm</frontend_class>
                 </field>
 
                 <field id="offerLiftGate" translate="label" type="select" sortOrder="23" showInDefault="1"
@@ -314,42 +247,13 @@
                     <label>Offer lift gate delivery as an option</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[Offer Lift Gate Delivery.]]></comment>
-                    <frontend_class>hide_if_fm</frontend_class>
                 </field>
 
                 <field id="RADforLiftgate" translate="label" type="select" sortOrder="24" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Always include lift gate delivery when a residential address is detected</label>
                     <frontend_model>Eniture\GlobalTranzLTLFreightQuotes\Block\System\Config\RADforLiftgate</frontend_model>
-                    <frontend_class>hide_if_fm</frontend_class>
                 </field>
-
-
-                <field id="finalMileServices" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1"
-                       showInStore="1">
-                    <label>Final Mile Services</label>
-                    <source_model>Eniture\GlobalTranzLTLFreightQuotes\Model\Source\FinalMileServices</source_model>
-                    <frontend_class>if_fm hide_if_nap</frontend_class>
-                </field>
-
-                <field id="thresholdLabelAs" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1"
-                       showInStore="1">
-                    <label>Label As</label>
-                    <frontend_class>if_fms_1 hide_if_nap</frontend_class>
-                </field>
-
-                <field id="choiceLabelAs" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1"
-                       showInStore="1">
-                    <label>Label As</label>
-                    <frontend_class>if_fms_2 hide_if_nap</frontend_class>
-                </field>
-
-                <field id="premiumLabelAs" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1"
-                       showInStore="1">
-                    <label>Label As</label>
-                    <frontend_class>if_fms_3 hide_if_nap</frontend_class>
-                </field>
-
 
                 <field id="hndlngFee" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1"
                        showInStore="1">

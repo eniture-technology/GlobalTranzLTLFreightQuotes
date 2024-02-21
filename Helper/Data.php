@@ -95,14 +95,18 @@ class Data extends AbstractHelper implements DataHelperInterface
 
     private $endPoint;
     public $scopeConfig;
-    /**
-     * @var bool
-     */
-    private $isFinalMile;
 
     private $liftGateArray = [];
-    private $cheapestLabel = null;
-    private $quickestLabel = null;
+    private $quotes;
+    private $totalCarriers;
+    private $OfferLiftgateAsAnOption;
+    private $RADforLiftgate;
+    private $residentialDlvry;
+    private $liftGate;
+    private $hndlngFee;
+    private $symbolicHndlngFee;
+    private $ownArangement;
+    private $ownArangementText;
 
     /**
      * @param Context $context
@@ -296,25 +300,15 @@ class Data extends AbstractHelper implements DataHelperInterface
      */
     public function quoteSettingsData()
     {
-        $fields = [
-            'gtLtlLcrLabelAs' => 'gtLtlLcrLabelAs',
-            'gtLtlQtrLabelAs' => 'gtLtlQtrLabelAs',
-            'labelAs' => 'labelAs',
-            'options' => 'options',
-            'ratingMethod' => 'ratingMethod',
-            'dlrvyEstimates' => 'dlrvyEstimates',
-            'ownArangement' => 'ownArangement',
-            'ownArangementText' => 'ownArangementText',
-            'residentialDlvry' => 'residentialDlvry',
-            'liftGate' => 'liftGate',
-            'OfferLiftgateAsAnOption' => 'offerLiftGate',
-            'RADforLiftgate' => 'RADforLiftgate',
-            'hndlngFee' => 'hndlngFee',
-            'symbolicHndlngFee' => 'symbolicHndlngFee',
-        ];
-        foreach ($fields as $key => $field) {
-            $this->$key = $this->configSettings[$field] ?? '';
-        }
+        $this->ownArangement = $this->configSettings['ownArangement'] ?? '';
+        $this->ownArangementText = $this->configSettings['ownArangementText'] ?? '';
+        $this->residentialDlvry = $this->configSettings['residentialDlvry'] ?? '';
+        $this->liftGate = $this->configSettings['liftGate'] ?? '';
+        $this->OfferLiftgateAsAnOption = $this->configSettings['offerLiftGate'] ?? '';
+        $this->RADforLiftgate = $this->configSettings['RADforLiftgate'] ?? '';
+        $this->hndlngFee = $this->configSettings['hndlngFee'] ?? '';
+        $this->symbolicHndlngFee = $this->configSettings['symbolicHndlngFee'] ?? '';
+
         $this->resiLabel = ' with residential delivery';
         $this->lgLabel = ' with lift gate delivery';
         $this->resiLgLabel = ' with residential delivery and lift gate delivery';
@@ -552,12 +546,11 @@ class Data extends AbstractHelper implements DataHelperInterface
      */
     public function getQuotesResults($quotes, $getMinimum, $isMultiShipmentQuantity, $scopeConfig)
     {
+        
         $this->configSettings = $this->getConfigData('gtQuoteSetting/fourth');
         $this->endPoint = $this->getTestConnConfigData('endPoint');
-        $this->isFinalMile = $this->endPoint == 1 && $this->configSettings['shippingService'] == 2;
         $allConfigServices = $this->getAllConfigServicesArray($scopeConfig);
         $this->quoteSettingsData();
-
         // Migration from Legacy to NEW API
         $quotes = $this->migrateApiIfNeeded($quotes);
 
@@ -568,7 +561,7 @@ class Data extends AbstractHelper implements DataHelperInterface
         $count = 0;
         $lgQuotes = false;
         $this->isMultiShipment = count($quotes) > 1;
-        
+
         foreach ($quotes as $origin => $quote) {
             if (isset($quote->severity)) {
                 return [];
@@ -577,17 +570,12 @@ class Data extends AbstractHelper implements DataHelperInterface
             if ($count == 0) { //To be checked only once
                 $inStoreLdData = $quote->InstorPickupLocalDelivery ?? false;
                 unset($quote->InstorPickupLocalDelivery);
-                if (!$this->isFinalMile) {
-                    $isRad = $quote->autoResidentialsStatus ?? '';
-                    $this->getAutoResidentialTitle($isRad);
-                    // also other condition associated (key: cond01)
-//                    $lgQuotes = $this->liftGate || $this->OfferLiftgateAsAnOption ||
-//                        ($this->isResi && $this->RADforLiftgate);
-                    $lgQuotes = $this->OfferLiftgateAsAnOption;
-                }
+                $isRad = $quote->autoResidentialsStatus ?? '';
+                $this->getAutoResidentialTitle($isRad);
+                $lgQuotes = $this->OfferLiftgateAsAnOption;
             }
 
-            $originQuotes = $arraySorting = $quickestArray = [];
+            $originQuotes = $arraySorting = [];
             if (isset($quote->q)) {
                 if (isset($quote->hazardousStatus)) {
                     $hazShipmentArr[$origin] = $quote->hazardousStatus == 'y' ? 'Y' : 'N';
@@ -597,20 +585,12 @@ class Data extends AbstractHelper implements DataHelperInterface
                 }
 
                 foreach ($quote->q as $key => $data) {
-                    $serviceType = $data->CarrierScac ?? '';
-                    $serviceDesc = $data->CarrierName ?? '';
-                    $transitDays = $data->totalTransitTimeInDays ?? '';
-                    if ($this->endPoint == 1 && $this->isFinalMile) {
-                        $serviceType = $data->CarrierScac ?? '';
-                        $serviceDesc = $data->CarrierName ?? '';
-                        //$transitDays = $data->totalTransitTimeInDays ?? '';
-                        $transitDays = '';
-                    }
+                    $serviceType = '';
+                    $serviceDesc = '';
+                    $transitDays = '';
                     if ($this->endPoint == 2) {
-                        //$serviceType = strpos($key, 'Quickest') !== false ? 'QTR' : 'LCR';
                         $serviceDesc = $data->CarrierDetail->CarrierName ?? '';
                         $serviceType = $data->CarrierDetail->CarrierCode ?? '';
-                        //$serviceDesc = preg_replace('/(?<!\ )[A-Z]/', ' $0', $key);
                         $transitDays = $data->totalTransitTimeInDays;
                     }
 
@@ -618,14 +598,12 @@ class Data extends AbstractHelper implements DataHelperInterface
                         $serviceType = $data->serviceType ?? '';
                         $serviceDesc = $data->serviceDesc ?? '';
                         $transitDays = $data->totalTransitTimeInDays;
+                        if(isset($data->serviceLevel) && is_string($data->serviceLevel) && strtolower($data->serviceLevel) != 'standard'){
+                            continue;
+                        }
                     }
 
                     if (in_array($serviceType, $allConfigServices)) {
-                        // commented this because rates for cerasis without liftgate were not showing
-//                        if ($this->endPoint == 1 && isset($data->CarrierScac) && !isset($this->liftGateArray[$data->CarrierScac])){
-//                            continue;
-//                        }
-                        $quickestArray['simple'][$key] = $transitDays;
                         $access = $this->getAccessorialCode();
                         $price = $this->calculatePrice($data);
                         $title = $this->getTitle($serviceDesc, false, false, $transitDays);
@@ -649,7 +627,7 @@ class Data extends AbstractHelper implements DataHelperInterface
                 }
             }
 
-            $compiledQuotes = $this->getCompiledQuotes($originQuotes, $arraySorting, $lgQuotes, $quickestArray);
+            $compiledQuotes = $this->getCompiledQuotes($originQuotes, $arraySorting, $lgQuotes);
             if ($compiledQuotes !== null && count($compiledQuotes)) {
                 if (count($compiledQuotes) > 1) {
 
@@ -697,34 +675,16 @@ class Data extends AbstractHelper implements DataHelperInterface
      */
     public function getFinalQuotesArray($quotes)
     {
-        if (!$this->isFinalMile) {
-//            (key: cond01)
-//            $lfg = $this->liftGate == 1 || ($this->isResi && $this->RADforLiftgate);
-            if ($this->isMultiShipment == false) {
-                if (isset($quotes['liftgate']) && $this->OfferLiftgateAsAnOption == 1 && ($this->RADforLiftgate == 0 || $this->isResi == 0)) {
-                    /**
-                     * Condition for lift gate as an option
-                     * */
-                    return array_merge($quotes['simple'], $quotes['liftgate']);
-                }
-                // (key: cond01)
-//                elseif ($lfg) {
-//                    /**
-//                     * Condition for Always lift gate and lift gate for residential (Single Shipment)
-//                     * */
-//                    return $quotes['liftgate'];
-//                }
-                else {
-                    return $quotes['simple'];
-                }
+        if ($this->isMultiShipment == false) {
+            if (isset($quotes['liftgate']) && $this->OfferLiftgateAsAnOption == 1 && ($this->RADforLiftgate == 0 || $this->isResi == 0)) {
+                /**
+                 * Condition for lift gate as an option
+                 * */
+                return array_merge($quotes['simple'], $quotes['liftgate']);
             }
-            // (key: cond01)
-//            elseif ($lfg) {
-//                /**
-//                 * Condition for always lift gate and lift gate for residential (Multi Shipment)
-//                 * */
-//                unset($quotes['simple']);
-//            }
+            else {
+                return $quotes['simple'];
+            }
         }
         return $this->organizeQuotesArray($quotes);
     }
@@ -787,13 +747,11 @@ class Data extends AbstractHelper implements DataHelperInterface
     public function getAccessorialCode($lgOption = false)
     {
         $access = '';
-        if (!$this->isFinalMile) {
-            if ($this->residentialDlvry == '1' || $this->isResi) {
-                $access .= '+R';
-            }
-            if (($lgOption || $this->liftGate == '1') || (!$this->OfferLiftgateAsAnOption && $this->RADforLiftgate && $this->isResi)) {
-                $access .= '+LG';
-            }
+        if ($this->residentialDlvry == '1' || $this->isResi) {
+            $access .= '+R';
+        }
+        if (($lgOption || $this->liftGate == '1') || (!$this->OfferLiftgateAsAnOption && $this->RADforLiftgate && $this->isResi)) {
+            $access .= '+LG';
         }
         return $access;
     }
@@ -808,16 +766,7 @@ class Data extends AbstractHelper implements DataHelperInterface
      */
     public function calculatePrice($data, $lgOption = false, $getCost = false)
     {
-        if ($this->endPoint == 1) {
-            if ($lgOption && !$this->configSettings['liftGate']){
-                $basePrice = $this->liftGateArray[$data->CarrierScac]->ShipmentRate ?? 0;
-            } else{
-                $lgCost = ($lgOption == true && $this->isFinalMile == false) ? $this->getLiftgateCost($data, $getCost) : 0;
-//                $basePrice = $this->isFinalMile ? $data->ShipmentRate : $data->totalNetCharge;
-                $basePrice = $data->ShipmentRate;
-                $basePrice = (float)$basePrice + (float)$lgCost;
-            }
-        } else if ($this->endPoint == 3){
+        if ($this->endPoint == 3){
 
             $basePrice = $data->totalNetCharge->Amount;
             $lgCost = !$lgOption ? $this->getLiftgateCost($data, $getCost) : 0;
@@ -841,11 +790,7 @@ class Data extends AbstractHelper implements DataHelperInterface
     {
         $lgCost = 0;
         if (!(($this->isResi && $this->RADforLiftgate) || $this->liftGate == '1') || $getCost) {
-            if ($this->endPoint == 1) {
-                if (isset($quotes->liftgatefee)) {
-                    $lgCost = $quotes->liftgatefee;
-                }
-            } else if($this->endPoint == 3){
+            if($this->endPoint == 3){
                 $lgCost = (isset($quotes->surcharges->liftgateFee) && is_numeric($quotes->surcharges->liftgateFee)) ? $quotes->surcharges->liftgateFee : 0;
             } else {
                 $charges = $quotes->Charges ?? [];
@@ -869,7 +814,7 @@ class Data extends AbstractHelper implements DataHelperInterface
         $handlingFeeMarkup = $this->hndlngFee;
         $symbolicHandlingFee = $this->symbolicHndlngFee;
 
-        if (strlen($handlingFeeMarkup) > 0) {
+        if (!empty($handlingFeeMarkup) && strlen($handlingFeeMarkup) > 0) {
             if ($symbolicHandlingFee == '%') {
                 $percentVal = $handlingFeeMarkup / 100 * $cost;
                 $grandTotal = $percentVal + $cost;
@@ -899,15 +844,13 @@ class Data extends AbstractHelper implements DataHelperInterface
         }
         $deliveryEstimateLabel = (!empty($deliveryEstimate) && isset($this->configSettings['dlrvyEstimates']) && $this->configSettings['dlrvyEstimates']) ? ' (Estimated transit time of ' . $deliveryEstimate . ' calender days)' : '';
         $accessTitle = '';
-        if (!$this->isFinalMile) {
-            if ($lgOption === true) {
-               $accessTitle = $this->isResi ? $this->resiLgLabel : $this->lgLabel;
-            } elseif ((!$this->OfferLiftgateAsAnOption && $this->RADforLiftgate) || $this->isResi) {
-                if ($this->RADforLiftgate && $this->isResi && !$this->OfferLiftgateAsAnOption) {
-                    $accessTitle = $this->resiLgLabel;
-                }elseif ($this->isResi){
-                    $accessTitle = $this->resiLabel;
-                }
+        if ($lgOption === true) {
+            $accessTitle = $this->isResi ? $this->resiLgLabel : $this->lgLabel;
+        } elseif ((!$this->OfferLiftgateAsAnOption && $this->RADforLiftgate) || $this->isResi) {
+            if ($this->RADforLiftgate && $this->isResi && !$this->OfferLiftgateAsAnOption) {
+                $accessTitle = $this->resiLgLabel;
+            }elseif ($this->isResi){
+                $accessTitle = $this->resiLabel;
             }
         }
 
@@ -948,20 +891,18 @@ class Data extends AbstractHelper implements DataHelperInterface
             $minInQ = $counter = 0;
             if (isset($quote->q)) {
                 foreach ($quote->q as $key => $data) {
-                    $serviceType = $data->serviceType ?? '';
-                    $serviceDesc = $data->serviceDesc ?? '';
-                    $transitDays = $data->transitDays ?? '';
-                    $currentAmount = $data->totalNetCharge ?? 0;
+                    $serviceType = '';
                     if ($this->endPoint == 2) {
-                        $serviceType = strpos($key, 'Quickest') !== false ? 'QTR' : 'LCR';
-                        if(!empty($origin)){
-                            $serviceDesc = preg_replace('/(?<!\ )[A-Z]/', ' $0', $origin);
-                        }
-                        $transitDays = $data->totalTransitTimeInDays;
+                        $serviceType = $data->CarrierDetail->CarrierCode ?? '';
                         $currentAmount = $data->LtlAmount ?? 0;
                     }
-                    if (in_array($serviceType, $allConfigServices)) {
 
+                    if($this->endPoint == 3){
+                        $serviceType = $data->serviceType ?? '';
+                        $currentAmount = $data->totalNetCharge->Amount ?? 0;
+                    }
+
+                    if (in_array($serviceType, $allConfigServices)) {
                         if ($counter == 0) {
                             $minInQ = $currentAmount;
                         } else {
@@ -1042,19 +983,10 @@ class Data extends AbstractHelper implements DataHelperInterface
     public function getAllConfigServicesArray($scopeConfig)
     {
         $servicesOptions = [];
-        if ($this->endPoint == 2 || $this->endPoint == 3) {
-            //$services = $scopeConfig->getValue('gtQuoteSetting/fourth/gtLtlQuoteServices', ScopeInterface::SCOPE_STORE);
-            //$servicesOptions = explode(",", $services);
-            $this->serviceOptions();
-            $selectedCarriers = $scopeConfig->getValue('gtLtlCarriers/second/selectedGtCarriers', ScopeInterface::SCOPE_STORE);
-            if(!empty($selectedCarriers) && is_string($selectedCarriers)){
-                $servicesOptions = json_decode($selectedCarriers);
-            }
-        } else {
-            $selectedCarriers = $scopeConfig->getValue('gtLtlCarriers/second/selectedCarriers', ScopeInterface::SCOPE_STORE);
-            if(!empty($selectedCarriers) && is_string($selectedCarriers)){
-                $servicesOptions = json_decode($selectedCarriers);
-            }
+        $this->serviceOptions();
+        $selectedCarriers = $scopeConfig->getValue('gtLtlCarriers/second/selectedGtCarriers', ScopeInterface::SCOPE_STORE);
+        if(!empty($selectedCarriers) && is_string($selectedCarriers)){
+            $servicesOptions = json_decode($selectedCarriers);
         }
         return (array)$servicesOptions;
     }
@@ -1368,85 +1300,18 @@ class Data extends AbstractHelper implements DataHelperInterface
      * @param $quickestArray
      * @return array
      */
-    public function getCompiledQuotes($services, $arraySorting, $lgQuotes, $quickestArray)
+    public function getCompiledQuotes($services, $arraySorting, $lgQuotes)
     {
-
         if (empty($arraySorting) || empty($services)) {
             return [];
         }
         asort($arraySorting['simple']);
-        if ($this->endPoint == 1) {
-            $options = 1;
-            if (!$this->isFinalMile) {
-                $options = ($this->configSettings['ratingMethod'] > 1 && $this->isMultiShipment == false) ? (int)$this->configSettings['options'] : 1;
-                if ($this->configSettings['ratingMethod'] == 3) {
-                    return $this->averageRattingMethod($arraySorting, $options, $lgQuotes);
-                }
-            }
-            $sliced = array_slice($arraySorting['simple'], 0, $options, true);
-        }else if($this->endPoint == 3){
-            $options = ($this->configSettings['ratingMethod'] > 1 && $this->isMultiShipment == false) ? (int)$this->configSettings['options'] : 1;
-            if ($this->configSettings['ratingMethod'] == 3) {
-                return $this->averageRattingMethod($arraySorting, $options, $lgQuotes);
-            }
-            $sliced = array_slice($arraySorting['simple'], 0, $options, true);
-        } else {
-            asort($quickestArray['simple']);
-            if (isset($this->LCR) && isset($this->QTR)){
-                /*$options = ($this->configSettings['ratingMethod'] > 1 && $this->isMultiShipment == false) ? (int)$this->configSettings['options'] : 1;
-                return $this->averageRattingMethod($arraySorting, $options, $lgQuotes);*/
-
-                $quickestOne = array_slice($quickestArray['simple'], 0, 1, true);
-                $cheapestOne = array_slice($arraySorting['simple'], 0, 1, true);
-                $sliced = array_intersect_key($quickestOne, $cheapestOne);
-
-                if (count($sliced) == 0){
-                    $cheapest = array_intersect_key($services, $cheapestOne);
-                    $quickest = array_intersect_key($services, $quickestOne);
-                    if (!empty($this->gtLtlLcrLabelAs)){
-                        foreach ($cheapest as $key => $cheap) {
-                            $title = $this->gtLtlLcrLabelAs != '' ? $this->gtLtlLcrLabelAs : $cheap['simple']['title'];
-                            $services[$key]['simple']['title'] = $this->getTitle($title,false,false,$cheap['simple']['delivery_estimate']);
-                            if (isset($services[$key]['liftgate'])){
-                                $services[$key]['liftgate']['title'] = $this->getTitle($title,true,false,$cheap['simple']['delivery_estimate']);
-                            }
-                        }
-                    }
-                    if (!empty($this->gtLtlQtrLabelAs)){
-                        foreach ($quickest as $key => $quick) {
-                            $title = $this->gtLtlQtrLabelAs != '' ? $this->gtLtlQtrLabelAs : $quick['simple']['title'];
-                            $services[$key]['simple']['title'] = $this->getTitle($title,false,false,$quick['simple']['delivery_estimate']);
-                            if (isset($services[$key]['liftgate'])){
-                                $services[$key]['liftgate']['title'] = $this->getTitle($title,true,false,$quick['simple']['delivery_estimate']);
-                            }
-                        }
-                    }
-                    //$sliced = array_merge($quickestOne, $cheapestOne);
-                    /*
-                     * will change way
-                     * */
-                    if (!empty($cheapest) && !empty($quickest)){
-                        $cheapestKey = array_keys($cheapestOne)[0];
-                        $quickestKey = array_keys($quickestOne)[0];
-                        if(isset($cheapestKey)){
-                            $sliced[$cheapestKey] = reset($cheapest);
-                        }else{
-                            $sliced[$quickestKey] = reset($quickest);
-                        }
-                    }else{
-                        $sliced = array_merge($quickestOne, $cheapestOne);
-                    }
-                }
-            }elseif (isset($this->QTR)){ //Quickest
-                $sliced = array_slice($quickestArray['simple'], 0, 1, true);
-            }elseif (isset($this->LCR)){ //Cheapest
-                $sliced = array_slice($arraySorting['simple'], 0, 1, true);
-            }else{
-                //$options = $this->isMultiShipment ? 1 : count($services);
-                $options = ($this->isMultiShipment == false) ? (int)$this->configSettings['options'] : 1;
-                $sliced = array_slice($arraySorting['simple'], 0, $options, true);
-            }
+        
+        $options = (!empty($this->configSettings['ratingMethod']) && $this->configSettings['ratingMethod'] > 1 && $this->isMultiShipment == false) ? (int)$this->configSettings['options'] : 1;
+        if (!empty($this->configSettings['ratingMethod']) && $this->configSettings['ratingMethod'] == 3) {
+            return $this->averageRattingMethod($arraySorting, $options, $lgQuotes);
         }
+        $sliced = array_slice($arraySorting['simple'], 0, $options, true);
 
         return array_intersect_key($services, $sliced);
     }
@@ -1454,7 +1319,7 @@ class Data extends AbstractHelper implements DataHelperInterface
     public function serviceOptions()
     {
         if (!empty($this->configSettings['gtLtlQuoteServices'])){
-            $serviceOptions = explode(',',$this->configSettings['gtLtlQuoteServices']);
+            $serviceOptions = empty($this->configSettings['gtLtlQuoteServices']) ? [] : explode(',', $this->configSettings['gtLtlQuoteServices']);
             if (count($serviceOptions)){
                 foreach ($serviceOptions as $serviceOption) {
                     $this->$serviceOption = true;
@@ -1502,33 +1367,9 @@ class Data extends AbstractHelper implements DataHelperInterface
 
     public function customLabel($serviceName)
     {
-        if ($this->endPoint == 1 || $this->endPoint == 3) {
-            if ($this->endPoint == 1 && $this->isFinalMile) {
-                switch ($this->configSettings['finalMileServices']) {
-                    case 1:
-                        $return = $this->configSettings['thresholdLabelAs'] ?? 'Threshold';
-                        break;
-                    case 2:
-                        $return = $this->configSettings['choiceLabelAs'] ?? 'Room of Choice';
-                        break;
-                    case 3:
-                        $return = $this->configSettings['premiumLabelAs'] ?? 'Premium';
-                        break;
-                }
-            } else {
-                $return = (($this->configSettings['ratingMethod'] == 1 ||
+        $return = (!$this->isMultiShipment && !empty($this->configSettings['ratingMethod']) && ($this->configSettings['ratingMethod'] == 1 ||
                         $this->configSettings['ratingMethod'] == 3) &&
-                    $this->configSettings['labelAs'] != null) ? $this->configSettings['labelAs'] : $serviceName;
-            }
-        } else {
-            if (isset($this->QTR) && !isset($this->LCR)) {
-                $return = $this->gtLtlQtrLabelAs != '' ? $this->gtLtlQtrLabelAs : $serviceName;
-            } elseif (!isset($this->QTR) && isset($this->LCR)) {
-                $return = $this->gtLtlLcrLabelAs != '' ? $this->gtLtlLcrLabelAs : $serviceName;
-            } else {
-                $return = $serviceName;
-            }
-        }
+                    !empty($this->configSettings['labelAs'])) ? $this->configSettings['labelAs'] : $serviceName;
         return $return;
     }
 

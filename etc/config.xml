@@ -4,8 +4,11 @@
         <gtQuoteSetting>
             <fourth>
                 <ownArangementText>I'll Arrange My Own Freight</ownArangementText>
-                <gtLtlQuoteServices>LCR,QTR</gtLtlQuoteServices>
                 <shipDays>1,2,3,4,5</shipDays>
+                <dlrvyEstimates>0</dlrvyEstimates>
+                <ratingMethod>1</ratingMethod>
+                <options>3</options>
+                <labelAs></labelAs>
             </fourth>
         </gtQuoteSetting>
         <carriers>

@@ -18,6 +18,9 @@ class SaveConfig
     private $configWriter;
     private $scopeConfig;
     private $request;
+    private $_cacheTypeList;
+    private $_cacheFrontendPool;
+    private $reinitableConfig;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -40,8 +43,7 @@ class SaveConfig
         \Closure $proceed
     ) {
         $post = $this->request->getPostValue();
-        $path = 'gtLtlCarriers/second/';
-        $path .= $this->apiEndpoint() == 1 ? 'selectedCarriers' : 'selectedGtCarriers';
+        $path = 'gtLtlCarriers/second/selectedGtCarriers';
         $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
 
         if (isset($post['config_state']['gtLtlCarriers_second'])) {
@@ -52,11 +54,6 @@ class SaveConfig
 
         $this->clearMagentoCache();
         return $proceed();
-    }
-
-    public function apiEndpoint()
-    {
-        return $this->scopeConfig->getValue('gtConnSettings/first/endPoint', ScopeInterface::SCOPE_STORE) ?? '1';
     }
 
     public function clearMagentoCache()

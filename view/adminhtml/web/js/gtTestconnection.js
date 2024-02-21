@@ -19,16 +19,7 @@ function gtTestConnectionAjaxCall($, ajaxURL) {
     let endPoint = $(common + 'endPoint').val();
     let credentials;
 
-    if (endPoint === '1') {   //For Cerasis
-        credentials = {
-            carrierName : 'cerasis',
-            shipperID: $(common + 'cerasisltlshipperID').val(),
-            username: $(common + 'cerasisltlusername').val(),
-            password: $(common + 'cerasisltlPassword').val(),
-            accessKey: $(common + 'cerasisltlAccessKey').val(),
-            pluginLicenceKey: $(common + 'licnsKey').val()
-    };
-    } else if (endPoint === '2') {    //For GlobalTranz
+    if (endPoint === '2') {    //For GlobalTranz
         credentials = {
             carrierName : 'globalTranz',
             username: $(common + 'gtLtlUsername').val(),

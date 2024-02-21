@@ -45,6 +45,12 @@ class BillOfLadding
      * @var ReinitableConfigInterface
      */
     private $reinitableConfig;
+    private $_coreRegistry;
+    private $_urlInterface;
+    private $_cacheTypeList;
+    private $_cacheFrontendPool;
+    private $bolNumber;
+    private $bolTrackingUrl;
 
     /**
      *
@@ -88,7 +94,7 @@ class BillOfLadding
 
         $shippingMethod = $orderData->getShippingMethod();
 
-        $explode = explode('_', $shippingMethod);
+        $explode = empty($shippingMethod) ? [] : explode('_', $shippingMethod);
         $this->method = (isset($explode[0])) ? $explode[0] : '';
         $carriersList = $this->_scopeConfig->getValue('gtLtlCarriers/second/selectedCarriers', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         if(!empty($carriersList) && is_string($carriersList)){

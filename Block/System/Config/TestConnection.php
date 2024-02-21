@@ -6,14 +6,12 @@ use Eniture\GlobalTranzLTLFreightQuotes\Helper\Data;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
-use Magento\Store\Model\ScopeInterface;
 
 class TestConnection extends Field
 {
     const BUTTON_TEMPLATE = 'system/config/testconnection.phtml';
 
     private $dataHelper;
-    private $scopeConfig;
 
     /**
      * @param Context $context
@@ -26,7 +24,6 @@ class TestConnection extends Field
         $data = []
     ) {
         $this->dataHelper = $dataHelper;
-        $this->scopeConfig = $context->getScopeConfig();
         parent::__construct($context, $data);
     }
 
@@ -88,16 +85,10 @@ class TestConnection extends Field
 
     public function gtLtlConnMsgs()
     {
-        $eP = $this->scopeConfig->getValue('gtConnSettings/first/endPoint', ScopeInterface::SCOPE_STORE) ?? 1;
-        $msgCe = 'You must have a Cerasis account to use this application. If you do not have one contact Cerasis at 800-734-5351 or <a target="_blank" href="http://cerasis.com/contact/transportation-management-consultation/">register online</a>';
-
         $msgGt = 'You must have a GlobalTranz account to use this application. If you do not have one contact GlobalTranz at 866-275-1407 or <a target="_blank" href="https://www.globaltranz.com/">register online</a>';
+        $div = '<div class="message message-notice notice gtLt-conn-setting-note"><div data-ui-id="messages-message-notice">'.$msgGt.'</div></div>';
 
-        $msg = $eP == 1 ? $msgCe : $msgGt ;
-        $div = '<div class="message message-notice notice gtLt-conn-setting-note"><div data-ui-id="messages-message-notice">'.$msg.'</div></div>';
-
-        return ['msgCe' => $msgCe,
-                'msgGt' => $msgGt,
+        return ['msgGt' => $msgGt,
                 'div' => $div
         ];
     }

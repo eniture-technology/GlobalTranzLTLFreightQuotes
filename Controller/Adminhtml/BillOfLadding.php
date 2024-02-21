@@ -62,6 +62,9 @@ class BillOfLadding extends Action
     protected $senderName;
 
     protected $orderRepository;
+    protected $_mageVersion;
+    protected $_configWriter;
+    protected $senderAddress;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -136,7 +139,7 @@ class BillOfLadding extends Action
     public function getCarrierScac()
     {
         $shippingMethod = $this->orderDetail->getShippingMethod();
-        $explode = explode('_', $shippingMethod);
+        $explode = empty($shippingMethod) ? [] : explode('_', $shippingMethod);
         $this->carrierSCAC = (isset($explode[1])) ? $explode[1] : '';
     }
 

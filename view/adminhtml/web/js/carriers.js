@@ -1,31 +1,5 @@
 /**
  *
- * @param {string} ajaxUrl
- * @return {undefined}
- */
-function refreshCerasisCarriers(ajaxUrl)
-{
-    const parameters = {
-        'action': 'getcarriers'
-    };
-
-    gtLtAjaxRequest(parameters, ajaxUrl, cerasisCarriersResultData);
-}
-
-/**
- *
- * @param {type} data
- * @return {undefined}
- */
-function cerasisCarriersResultData(data)
-{
-    if (data.SUCCESS) {
-        location.reload();
-    }
-}
-
-/**
- *
  * @return {undefined}
  */
 function selectAllCarriers()
@@ -53,23 +27,3 @@ function unselectAllCarrierSelectCheckbox()
     }
 }
 
-function autoEnableNewCarriers(ajaxUrl)
-{
-    const parameters = {
-        'action': 'saveAutoEnable',
-        'autoEnable': (jQuery('.auto_enable').prop('checked')) ? 'yes' : 'no'
-    };
-    gtLtAjaxRequest(parameters, ajaxUrl, autoenableCarriersResult);
-}
-
-/**
- *
- * @param {type} data
- * @return {undefined}
- */
-function autoenableCarriersResult(data)
-{
-//           if(data.SUCCESS){
-//               location.reload();
-//           }
-}

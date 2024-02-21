@@ -20,10 +20,6 @@
 
     $('#cerasisgtQuoteSetting_fourth_hndlngFee').attr('title', 'Handling Fee / Markup');
 
-    //gtRatingMethodComment(); //check windows load label
-    /*$('#gtQuoteSetting_fourth_ratingMethod').on('change', function () {
-        gtRatingMethodComment(); //Add label on change rating methods
-    });*/
     // Set focus on first input field
 
     $(".cerasisQuoteServices").on('change load', function () {
@@ -85,23 +81,18 @@ function gtChangeLiftgateOption(selectId, optionVal) {
 /**
  * Add label to rating method
  */
-function gtRatingMethodComment(endpoint = null) {
+function gtRatingMethodComment() {
     const ratingMethod = jQuery('#gtQuoteSetting_fourth_ratingMethod').val();
     if (ratingMethod == 3) {
         jQuery('#gtQuoteSetting_fourth_ratingMethod').next().text('Displays a single rate based on an average of a specified number of least expensive options.');
-        
-        if (endpoint !== null && (endpoint == 2 || endpoint == 3)){
-            jQuery('#gtQuoteSetting_fourth_options').next().text('Number of options to display in the shopping cart.');
-        }else{
-            jQuery('#gtQuoteSetting_fourth_options').next().text('Number of options to include in the calculation of the average.');
-        }
+        jQuery('#gtQuoteSetting_fourth_options').next().text('Number of options to include in the calculation of the average.');
         jQuery('#gtQuoteSetting_fourth_labelAs').next().text('What the user sees during checkout, e.g. "Freight". If left blank will default to "Freight".');
     } else if (ratingMethod == 1) {
         jQuery('#gtQuoteSetting_fourth_ratingMethod').next().text('Displays a least expensive option.');
-        jQuery('#gtQuoteSetting_fourth_labelAs').next().text('What the user sees during checkout e.g. "Freight". Leave blank to display carrier name.');
+        jQuery('#gtQuoteSetting_fourth_labelAs').next().text('What the user sees during checkout, e.g. "Freight". Leave blank to display the carrier name.');
     } else {
         jQuery('#gtQuoteSetting_fourth_options').next().text('Number of options to display in the shopping cart.');
-        jQuery('#gtQuoteSetting_fourth_ratingMethod').next().text('Displays list of specified number of least expensive options.');
+        jQuery('#gtQuoteSetting_fourth_ratingMethod').next().text('Displays a list of a specified number of least expensive options.');
     }
 }
 

@@ -26,7 +26,7 @@ class ValidationRules
         $rules = $proceed($attribute,$data);
         $dims = ['en_length', 'en_width', 'en_height'];
         if(in_array($attribute->getAttributeCode(), $dims)){ //custom filter
-            $validationClasses = explode(' ', $attribute->getFrontendClass());
+            $validationClasses = empty($attribute->getFrontendClass()) ? [] : explode(' ', $attribute->getFrontendClass());
             foreach ($validationClasses as $class) {
                 $rules[$class] = true;
             }

@@ -2,7 +2,6 @@
 $planMsg   = $block->getPlanNotice();
 $connMsgs  = $block->gtLtlConnMsgs();
 $connMsg   = $connMsgs['div'];
-$msgCe   = $connMsgs['msgCe'];
 $msgGt   = $connMsgs['msgGt'];
 ?>
 <script>
@@ -10,16 +9,8 @@ $msgGt   = $connMsgs['msgGt'];
         let carrierDiv = '#gtConnSettings_first-head';
         gtLtNotesToggleHandling($, '<?= $connMsg; ?>', '.gtLt-conn-setting-note', carrierDiv);
         gtLtCurrentPlanNote($, '<?= $planMsg; ?>', carrierDiv);
-
-        $("#gtConnSettings_first_endPoint").on("change", function (){
-            let msg = '';
-            if (this.value === '1'){
-                msg = '<?= $msgCe; ?>';
-            }else {
-                msg = '<?= $msgGt; ?>';
-            }
-            $(".gtLt-conn-setting-note div").html(msg);
-        });
+        msg = '<?= $msgGt; ?>';
+        $(".gtLt-conn-setting-note div").html(msg);
     });
 </script>
 <div class="pp-buttons-container">

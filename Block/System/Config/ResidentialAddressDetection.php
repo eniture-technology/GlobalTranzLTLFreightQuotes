@@ -175,11 +175,6 @@ class ResidentialAddressDetection extends Field
         return json_encode($this->dataHelper->quoteSettingFieldsToRestrict());
     }
 
-    public function apiEndpoint()
-    {
-        return $this->scopeConfig->getValue('gtConnSettings/first/endPoint', ScopeInterface::SCOPE_STORE) ?? '1';
-    }
-
     /**
      * @return string
      */
