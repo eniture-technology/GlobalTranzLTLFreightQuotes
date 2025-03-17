@@ -99,7 +99,12 @@ class Carriers extends Field
 
     public function getGlobalTranzCarriersList()
     {
-        $this->selectedCarriers = json_decode($this->getConfigData('selectedGtCarriers'));
+        $selectedCarriers = $this->getConfigData('selectedGtCarriers');
+        if (!empty($selectedCarriers) && is_string($selectedCarriers)) {
+            $this->selectedCarriers = json_decode($selectedCarriers);
+        }else{
+            $this->selectedCarriers = [];
+        }
         $this->carriersList = GlobalTranzCarriers::getCarriersArray();
     }
 

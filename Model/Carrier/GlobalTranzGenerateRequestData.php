@@ -80,7 +80,7 @@ class GlobalTranzGenerateRequestData
             'serverName' => $this->request->getServer('SERVER_NAME'),
             'carrierMode' => 'pro', // use test / pro
             'quotestType' => 'ltl', // ltl / small
-            'version' => '3.0',
+            'version' => '3.1.2',
             'returnQuotesOnExceedWeight' => $this->getConfigData('weightExeeds'),
             'liftGateAsAnOption' => $this->getConfigData('offerLiftGate'),
             'api' => $this->getApiInfoArr(),
@@ -138,6 +138,7 @@ class GlobalTranzGenerateRequestData
         return [
             'apiVersion' => '3.0',
             'platform' => 'magento2',
+            'version' => '3.1.2',
             'binPackagingMultiCarrier' => $this->binPackSuspend(),
             'autoResidentials' => $autoResidential,
             'liftGateWithAutoResidentials' => $liftGateWithAuto,

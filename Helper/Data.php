@@ -983,7 +983,6 @@ class Data extends AbstractHelper implements DataHelperInterface
     public function getAllConfigServicesArray($scopeConfig)
     {
         $servicesOptions = [];
-        $this->serviceOptions();
         $selectedCarriers = $scopeConfig->getValue('gtLtlCarriers/second/selectedGtCarriers', ScopeInterface::SCOPE_STORE);
         if(!empty($selectedCarriers) && is_string($selectedCarriers)){
             $servicesOptions = json_decode($selectedCarriers);
@@ -1314,18 +1313,6 @@ class Data extends AbstractHelper implements DataHelperInterface
         $sliced = array_slice($arraySorting['simple'], 0, $options, true);
 
         return array_intersect_key($services, $sliced);
-    }
-
-    public function serviceOptions()
-    {
-        if (!empty($this->configSettings['gtLtlQuoteServices'])){
-            $serviceOptions = empty($this->configSettings['gtLtlQuoteServices']) ? [] : explode(',', $this->configSettings['gtLtlQuoteServices']);
-            if (count($serviceOptions)){
-                foreach ($serviceOptions as $serviceOption) {
-                    $this->$serviceOption = true;
-                }
-            }
-        }
     }
 
     /**

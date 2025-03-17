@@ -608,10 +608,13 @@ class GlobalTranzLtlShipping extends AbstractCarrier implements
 
     public function printQuery()
     {
+        if(empty($this->request->getServer('HTTP_REFERER'))){
+            return 0;
+        }
         $printQuery = 0;
         $query = [];
         $url = parse_url($this->request->getServer('HTTP_REFERER'), PHP_URL_QUERY);
-        if(is_string($url)){
+        if(!empty($url) && is_string($url)){
             parse_str($url, $query);
         }
         
